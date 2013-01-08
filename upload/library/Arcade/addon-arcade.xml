@@ -1,0 +1,857 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon addon_id="arcade" title="XF Arcade" version_string="0.0.8" version_id="8" url="http://xfarcade.com" install_callback_class="Arcade_Installer" install_callback_method="install" uninstall_callback_class="Arcade_Installer" uninstall_callback_method="uninstall">
+  <admin_navigation>
+    <navigation navigation_id="arcade" parent_navigation_id="" display_order="21" link="arcade" admin_permission_id="arcade" debug_only="0" hide_no_children="1"/>
+    <navigation navigation_id="arcade_categories" parent_navigation_id="arcade" display_order="2" link="arcade/categories" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="arcade_game_add" parent_navigation_id="arcade_games" display_order="20" link="arcade/add-game" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="arcade_game_list" parent_navigation_id="arcade_games" display_order="1" link="arcade/games" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="arcade_games" parent_navigation_id="arcade" display_order="1" link="arcade/games" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="arcade_options" parent_navigation_id="arcade" display_order="100" link="options/list/xfarcade" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
+  </admin_navigation>
+  <admin_permissions>
+    <admin_permission admin_permission_id="arcade" display_order="9999"/>
+  </admin_permissions>
+  <admin_style_properties/>
+  <admin_templates>
+    <template title="arcade_category_delete"><![CDATA[<xen:title>{xen:phrase arcade_confirm_deletion_of_category}: {$category.title}</xen:title>
+<xen:h1>{xen:phrase arcade_confirm_deletion_of_category}</xen:h1>
+
+<xen:navigation>
+	<xen:breadcrumb href="{xen:adminlink 'arcade/edit-category', $category}">{$category.title}</xen:breadcrumb>
+</xen:navigation>
+
+<xen:require css="delete_confirmation.css" />
+
+<xen:form action="{xen:adminlink 'arcade/delete-category', $category}" class="deleteConfirmForm formOverlay">
+
+	<p>{xen:phrase arcade_please_confirm_that_you_want_to_delete_following_category}:</p>
+	<strong><a href="{xen:adminlink 'arcade/edit-category', $category}">{$category.title}</a></strong>
+
+	<xen:submitunit save="{xen:phrase arcade_delete_category}" />
+	
+	<input type="hidden" name="_xfConfirm" value="1" />
+</xen:form>]]></template>
+    <template title="arcade_category_edit"><![CDATA[<xen:title>{xen:if '{$category.category_id}', '{xen:phrase arcade_edit_category}: {$category.title}', '{xen:phrase arcade_create_new_category}'}</xen:title>
+
+<xen:form action="{xen:adminlink 'arcade/save-category'}">
+
+	<xen:textboxunit label="{xen:phrase title}:" name="title" value="{$category.title}" data-liveTitleTemplate="{xen:if {$category.category_id},
+		'{xen:phrase arcade_edit_category}: <em>%s</em>',
+		'{xen:phrase arcade_create_new_category}: <em>%s</em>'}" />
+	<xen:spinboxunit label="{xen:phrase display_order}:" name="display_order" value="{$category.display_order}" min="1"/>
+	<xen:checkboxunit label="">
+		<xen:option name="active" selected="{$category.active}">{xen:phrase arcade_category_is_active}</xen:option>
+	</xen:checkboxunit>
+
+	<xen:submitunit save="{xen:phrase arcade_save_category}">
+		<xen:if is="{$category.category_id}">
+			<input type="button" value="{xen:phrase arcade_delete_category}..." accesskey="d" class="button OverlayTrigger"
+				data-href="{xen:adminlink arcade/delete-category, $category}" />
+		</xen:if>
+	</xen:submitunit>
+	
+	<input type="hidden" name="category_id" value="{$category.category_id}" />
+</xen:form>]]></template>
+    <template title="arcade_category_list"><![CDATA[<xen:title>{xen:phrase arcade_categories}</xen:title>
+
+<xen:topctrl>
+	<a href="{xen:adminlink 'arcade/add-category'}" class="button" accesskey="a">+ {xen:phrase arcade_create_new_category}</a>
+</xen:topctrl>
+
+<xen:require css="filter_list.css" />
+<xen:require js="js/xenforo/filter_list.js" />
+
+<xen:form action="{xen:adminlink 'arcade/categories'}" class="section">
+
+	<h2 class="subHeading">
+		<xen:include template="filter_list_controls" />
+		{xen:phrase arcade_categories}
+	</h2>
+
+	<ol class="FilterList Scrollable">
+		<xen:foreach loop="$categories" value="$category">
+			<xen:listitem
+				id="{$category.category_id}"
+				label="{$category.title}"
+				labelclass="{xen:if '!{$category.active}', 'disabled'}"
+				href="{xen:adminlink 'arcade/edit-category', $category}"
+				delete="{xen:adminlink 'arcade/delete-category', $category}" />
+		</xen:foreach>
+	</ol>
+
+	<p class="sectionFooter">{xen:phrase showing_x_of_y_items, 'count=<span class="FilterListCount">{xen:count $categories}</span>', 'total={xen:count $categories}'}</p>
+
+</xen:form>]]></template>
+    <template title="arcade_game_delete"><![CDATA[<xen:title>{xen:phrase arcade_confirm_deletion_of_game}: {$game.title}</xen:title>
+<xen:h1>{xen:phrase arcade_confirm_deletion_of_game}</xen:h1>
+
+<xen:navigation>
+	<xen:breadcrumb href="{xen:adminlink 'arcade/edit-game', $game}">{$game.title}</xen:breadcrumb>
+</xen:navigation>
+
+<xen:require css="delete_confirmation.css" />
+
+<xen:form action="{xen:adminlink 'arcade/delete-game', $game}" class="deleteConfirmForm formOverlay">
+
+	<p>{xen:phrase arcade_please_confirm_that_you_want_to_delete_following_game}:</p>
+	<strong><a href="{xen:adminlink 'arcade/edit-game', $game}">{$game.title}</a></strong>
+
+	<xen:submitunit save="{xen:phrase arcade_delete_game}" />
+	
+	<input type="hidden" name="_xfConfirm" value="1" />
+</xen:form>]]></template>
+    <template title="arcade_game_edit"><![CDATA[<xen:title>{xen:if '{$game.game_id}', '{xen:phrase arcade_edit_game}: {$game.title}', '{xen:phrase arcade_add_new_game}'}</xen:title>
+{xen:if '{$game.game_id}', '', '{xen:phrase arcade_add_new_game_explain}'}
+<xen:require js="js/arcade/functions.js" />
+
+<xen:form action="{xen:adminlink 'arcade/save-game'}" class="GameEditor" enctype="multipart/form-data">
+	<xen:textboxunit id="gameTitle" label="{xen:phrase arcade_title}" name="title" value="{$game.title}" data-liveTitleTemplate="{xen:if {$game.game_id},
+		'{xen:phrase arcade_edit_game}: <em>%s</em>',
+		'{xen:phrase arcade_add_new_game}: <em>%s</em>'}">
+		<xen:explain>{xen:phrase arcade_title_explain}</xen:explain>
+	</xen:textboxunit>
+	
+	<xen:textboxunit id="gameSlug" label="{xen:phrase arcade_slug}" name="slug" value="{$game.slug}">
+		<xen:explain>{xen:phrase arcade_slug_explain}</xen:explain>
+	</xen:textboxunit>
+	
+	<xen:textboxunit label="{xen:phrase arcade_description}" name="description" value="{$game.description}" inputclass="Elastic" rows="5">
+		<xen:explain>{xen:phrase arcade_description_explain}</xen:explain>
+	</xen:textboxunit>
+	
+	<xen:textboxunit label="{xen:phrase arcade_instruction}" name="instruction" value="{$game.instruction}" inputclass="Elastic" rows="5">
+		<xen:explain>{xen:phrase arcade_instruction_explain}</xen:explain>
+	</xen:textboxunit>
+	
+	<xen:selectunit label="{xen:phrase arcade_category}" name="category_id" value="{$game.category_id}">
+		<xen:options source="$categoriesSource" />
+		<xen:explain>{xen:phrase arcade_category_explain}</xen:explain>
+	</xen:selectunit>
+		
+	<fieldset>
+	<xen:selectunit label="{xen:phrase arcade_system}" name="system_id" value="{$game.system_id}"
+		inputclass="GameSystemOptions" data-optionsUrl="{xen:adminlink arcade/system-options}" data-optionsTarget="#GameSystemOptionsTarget">
+		<xen:option value=""></xen:option>
+		<xen:options source="$systemsSource" />	
+                <xen:html>
+                     <div id="GameSystemOptionsTarget">
+	                  <xen:include template="arcade_game_system_options" />
+        	     </div>
+                </xen:html>               
+                <xen:explain>{xen:if '{$game.game_id}', '', '{xen:phrase arcade_system_option_explain}'}</xen:explain>
+	</xen:selectunit>
+
+
+	
+	<xen:checkboxunit label="">
+		<xen:option name="reversed_scoring" selected="{$game.reversed_scoring}">{xen:phrase arcade_game_is_reversed_scoring}</xen:option>
+		<xen:explain>{xen:phrase arcade_game_is_reversed_scoring_explain}</xen:explain>
+	</xen:checkboxunit>
+	</fieldset>
+	
+	<xen:uploadunit label="{xen:phrase arcade_image}" name="image" value="">
+		<div id="imageHtml">{xen:if "{$game.image_date}", {xen:phrase arcade_image_explain_with_image, 'image=<img src="{$game.images.x}"/>'}, {xen:phrase arcade_image_explain}}</div>
+	</xen:uploadunit>
+	
+	<xen:checkboxunit label="">
+		<xen:option name="active" selected="{$game.active}">{xen:phrase arcade_game_is_active}</xen:option>
+	</xen:checkboxunit>
+
+	<xen:submitunit>
+		<input type="submit" name="reload" value="{xen:phrase arcade_save_game}" class="button primary" id="saveReloadButton"
+               data-ajaxvalue="{xen:if '!{$game.game_id}', '{xen:phrase continue}', '{xen:phrase save_all_changes}'}" />
+		<xen:if is="{$game.game_id}">
+               <input type="submit" name="saveexit" value="{xen:phrase save_and_exit}" class="button" id="saveExitButton" />
+               <input type="button" name="delete" value="{xen:phrase arcade_delete_game}..." accesskey="d" class="button OverlayTrigger"
+                    data-href="{xen:adminlink arcade/delete-game, $game}"
+                    id="deleteButton" {xen:if '!{$game.game_id}', 'style="display: none"'}
+               />
+		</xen:if>
+	</xen:submitunit>
+
+	<input id="gameId" type="hidden" name="game_id" value="{$game.game_id}" />
+</xen:form>]]></template>
+    <template title="arcade_game_list"><![CDATA[<xen:title>{xen:phrase arcade_games}</xen:title>
+
+<xen:topctrl>
+	<a href="{xen:adminlink 'arcade/add-game'}" class="button" accesskey="a">+ {xen:phrase arcade_add_new_game}</a>
+</xen:topctrl>
+
+<xen:require css="filter_list.css" />
+<xen:require js="js/xenforo/filter_list.js" />
+
+<xen:form action="{xen:adminlink 'arcade/games'}" class="section">
+
+	<h2 class="subHeading">
+		<xen:include template="filter_list_controls" />
+		{xen:phrase arcade_games}
+	</h2>
+
+	<ol class="FilterList Scrollable">
+		<xen:foreach loop="$categories" value="$category">
+		<li>
+			<h3 class="textHeading">{$category.title} <span class="count">({xen:count $category.games})</span></h3>
+			<ol>
+				<xen:if is="{$category.games}">
+				<xen:foreach loop="$category.games" value="$game">
+					<xen:listitem
+						id="{$game.game_id}"
+						label="{$game.title}"
+						beforelabel="{xen:if "{$game.images.s}", '<img src="{$game.images.s}" style="float: left; height: 26px" />'}"
+						labelclass="{xen:if '!{$game.active}', 'disabled'}"
+						href="{xen:adminlink 'arcade/edit-game', $game}"
+						delete="{xen:adminlink 'arcade/delete-game', $game}" />
+				</xen:foreach>
+				</xen:if>
+			</ol>
+		</xen:foreach>
+	</ol>
+
+	<p class="sectionFooter">{xen:phrase showing_x_of_y_items, 'count=<span class="FilterListCount">{xen:count $games}</span>', 'total={xen:count $games}'}</p>
+
+</xen:form>]]></template>
+    <template title="arcade_game_system_options"><![CDATA[<input id="systemOptionsLoaded" type="hidden" name="system_options_loaded" value="{$system_options_loaded}" />
+
+<xen:foreach loop="$renderedOptions" value="$renderedOption">
+{xen:raw {$renderedOption}}
+</xen:foreach>
+
+{xen:raw $customizedOptions}]]></template>
+    <template title="arcade_system_core_options"><![CDATA[<xen:uploadunit label="{xen:phrase arcade_system_option_target}" name="target" value="">
+	<div id="targetHtml">{xen:if "{$targetFound}", {xen:phrase arcade_target_found, "target={$targetPath}"}}</div>
+</xen:uploadunit>
+<p class="explain">{xen:phrase arcade_system_option_target_explain}</p>]]></template>
+    <template title="arcade_system_ipb_options"><![CDATA[<xen:uploadunit label="{xen:phrase arcade_system_option_target}" name="target" value="">
+	<div id="targetHtml">{xen:if "{$targetFound}", {xen:phrase arcade_target_found, "target={$targetPath}"}}</div>
+</xen:uploadunit>
+<p class="explain">{xen:phrase arcade_system_option_target_explain}</p>
+
+<xen:uploadunit label="{xen:phrase arcade_system_ipb_option_files}" name="file" value="">
+	<div id="fileHtml">{$additionalFiles}</div>
+</xen:uploadunit>
+<p class="explain">{xen:phrase arcade_system_ipb_option_files_explain}</p>
+]]></template>
+  </admin_templates>
+  <code_events/>
+  <code_event_listeners>
+    <listener event_id="load_class_controller" execute_order="9999" callback_class="Arcade_Listener" callback_method="load_class" active="1" description=""/>
+    <listener event_id="navigation_tabs" execute_order="10" callback_class="Arcade_Listener" callback_method="navigation_tabs" active="1" description="Add menu links"/>
+    <listener event_id="template_hook" execute_order="20" callback_class="Arcade_Template_Hook" callback_method="template" active="1" description="Adds the champion seal if enabled."/>
+  </code_event_listeners>
+  <cron/>
+  <email_templates/>
+  <optiongroups>
+    <group group_id="xfarcade" display_order="1" debug_only="0"/>
+    <option option_id="xfarcade_champion" edit_format="onoff" data_type="boolean" can_backup="1">
+      <default_value>0</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="xfarcade" display_order="40"/>
+    </option>
+    <option option_id="xfarcade_disabled_message" edit_format="textbox" data_type="string" can_backup="1">
+      <default_value>System is currently under going maintenance.</default_value>
+      <edit_format_params>rows=3</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="xfarcade" display_order="2"/>
+    </option>
+    <option option_id="xfarcade_enable" edit_format="onoff" data_type="boolean" can_backup="1">
+      <default_value>1</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="xfarcade" display_order="1"/>
+    </option>
+    <option option_id="xfarcade_image_path" edit_format="textbox" data_type="string" can_backup="1">
+      <default_value></default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="xfarcade" display_order="42"/>
+    </option>
+    <option option_id="xfarcade_pc_message" edit_format="textbox" data_type="string" can_backup="1">
+      <default_value>Your score has just been beat. So go back and get that champion status back.</default_value>
+      <edit_format_params>rows=3</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="xfarcade" display_order="51"/>
+    </option>
+    <option option_id="xfarcade_pc_title" edit_format="textbox" data_type="string" can_backup="1">
+      <default_value>Champion no more!!!</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="xfarcade" display_order="50"/>
+    </option>
+    <option option_id="xfarcade_play_display" edit_format="select" data_type="integer" can_backup="1">
+      <default_value>1</default_value>
+      <edit_format_params>1=Non-Overlay
+2=Overlay</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="xfarcade" display_order="3"/>
+    </option>
+    <option option_id="xfarcade_text" edit_format="onoff" data_type="boolean" can_backup="1">
+      <default_value>0</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="xfarcade" display_order="41"/>
+    </option>
+  </optiongroups>
+  <permissions>
+    <permission_groups>
+      <permission_group permission_group_id="xfarcade"/>
+    </permission_groups>
+    <permissions>
+      <permission permission_group_id="xfarcade" permission_id="xfarcade_can_comment" permission_type="flag" depend_permission_id="xfarcade_can_use" default_value="unset" interface_group_id="xfarcade" display_order="40"/>
+      <permission permission_group_id="xfarcade" permission_id="xfarcade_can_use" permission_type="flag" depend_permission_id="xfarcade_can_view" default_value="unset" interface_group_id="xfarcade" display_order="20"/>
+      <permission permission_group_id="xfarcade" permission_id="xfarcade_can_view" permission_type="flag" default_value="unset" interface_group_id="xfarcade" display_order="10"/>
+      <permission permission_group_id="xfarcade" permission_id="xfarcade_can_vote" permission_type="flag" depend_permission_id="xfarcade_can_use" default_value="unset" interface_group_id="xfarcade" display_order="30"/>
+    </permissions>
+    <interface_groups>
+      <interface_group interface_group_id="xfarcade" display_order="10999"/>
+    </interface_groups>
+  </permissions>
+  <phrases>
+    <phrase title="admin_navigation_arcade" version_id="1" version_string="0.0.1"><![CDATA[XF Arcade]]></phrase>
+    <phrase title="admin_navigation_arcade_categories" version_id="1" version_string="0.9"><![CDATA[Categories]]></phrase>
+    <phrase title="admin_navigation_arcade_games" version_id="1" version_string="0.9"><![CDATA[Games]]></phrase>
+    <phrase title="admin_navigation_arcade_game_add" version_id="1" version_string="0.9"><![CDATA[Add New Game]]></phrase>
+    <phrase title="admin_navigation_arcade_game_list" version_id="10001" version_string="1.0.1"><![CDATA[List Games]]></phrase>
+    <phrase title="admin_navigation_arcade_options" version_id="1" version_string="0.0.1"><![CDATA[Options]]></phrase>
+    <phrase title="admin_permission_arcade" version_id="1" version_string="0.0.1"><![CDATA[XF Arcade]]></phrase>
+    <phrase title="arcade" global_cache="1" version_id="1" version_string="0.9"><![CDATA[Arcade]]></phrase>
+    <phrase title="arcade_add_new_game" version_id="1" version_string="0.9"><![CDATA[Add New Game]]></phrase>
+    <phrase title="arcade_add_new_game_explain" version_id="1" version_string="0.0.1"><![CDATA[*** PLEASE READ ***<br />
+You are adding a new game.  Adding a new game manually is a two-step process.  After you are done entering the information on this page and click the "Save All Changes" button below you will then be prompted for additional information about the game.  That is where you will upload the .swf file and other files if needed.  It is a two-step process because the additional information needed for the game will be different based upon the game System type.]]></phrase>
+    <phrase title="arcade_all" version_id="1" version_string="0.9"><![CDATA[All]]></phrase>
+    <phrase title="arcade_categories" version_id="1" version_string="0.9"><![CDATA[Game Categories]]></phrase>
+    <phrase title="arcade_category" version_id="1" version_string="0.9"><![CDATA[Category]]></phrase>
+    <phrase title="arcade_category_explain" version_id="1" version_string="0.0.1"><![CDATA[Select a category for the game.  If you need to create or edit the category names, click on the "Categories" link in the sidebar menu.]]></phrase>
+    <phrase title="arcade_category_is_active" version_id="1" version_string="0.9"><![CDATA[Category is active]]></phrase>
+    <phrase title="arcade_category_not_found" version_id="1" version_string="0.9"><![CDATA[The requested category could not be found.]]></phrase>
+    <phrase title="arcade_category_title_must_be_unique" version_id="1" version_string="0.9"><![CDATA[Category title must be unique. A category has already existed with the specified title.]]></phrase>
+    <phrase title="arcade_champion" version_id="1" version_string="0.9"><![CDATA[Champion]]></phrase>
+    <phrase title="arcade_change_vote" version_id="1" version_string="0.9"><![CDATA[Change Vote]]></phrase>
+    <phrase title="arcade_confirm_deletion_of_category" version_id="1" version_string="0.0.1"><![CDATA[Confirm Deletion of Category]]></phrase>
+    <phrase title="arcade_confirm_deletion_of_game" version_id="1" version_string="super-beta"><![CDATA[Confirm Deletion of Game]]></phrase>
+    <phrase title="arcade_copyright" version_id="3" version_string="0.0.3"><![CDATA[<a href="http://xfarcade.com">Gaming by XF Arcade</a>]]></phrase>
+    <phrase title="arcade_create_new_category" version_id="1" version_string="0.9"><![CDATA[Create New Category]]></phrase>
+    <phrase title="arcade_delete_category" version_id="1" version_string="0.9"><![CDATA[Delete Category]]></phrase>
+    <phrase title="arcade_delete_game" version_id="1" version_string="0.9"><![CDATA[Delete Game]]></phrase>
+    <phrase title="arcade_description" version_id="1" version_string="0.9"><![CDATA[Description]]></phrase>
+    <phrase title="arcade_description_explain" version_id="1" version_string="0.0.1"><![CDATA[Enter a description for the game.]]></phrase>
+    <phrase title="arcade_each_game_must_be_in_a_category" version_id="1" version_string="0.9"><![CDATA[Each game must be in a category.]]></phrase>
+    <phrase title="arcade_each_game_must_be_in_a_system" version_id="1" version_string="0.9"><![CDATA[Each game must be in a system.]]></phrase>
+    <phrase title="arcade_edit_category" version_id="1" version_string="0.9"><![CDATA[Edit Category]]></phrase>
+    <phrase title="arcade_edit_game" version_id="1" version_string="0.9"><![CDATA[Edit Game]]></phrase>
+    <phrase title="arcade_games" version_id="1" version_string="0.9"><![CDATA[Games]]></phrase>
+    <phrase title="arcade_game_is_active" version_id="1" version_string="0.9"><![CDATA[is active.]]></phrase>
+    <phrase title="arcade_game_is_reversed_scoring" version_id="1" version_string="0.9"><![CDATA[is reversed scoring.]]></phrase>
+    <phrase title="arcade_game_is_reversed_scoring_explain" version_id="1" version_string="0.9"><![CDATA[With normal games, the higher score the better. With reversed scoring games, the lower score the better.]]></phrase>
+    <phrase title="arcade_game_not_found" version_id="1" version_string="0.9"><![CDATA[The requested game could not be found.]]></phrase>
+    <phrase title="arcade_game_saved_successfully" version_id="1" version_string="0.9"><![CDATA[Game has been saved successfully]]></phrase>
+    <phrase title="arcade_image" version_id="1" version_string="0.9"><![CDATA[Image]]></phrase>
+    <phrase title="arcade_image_explain" version_id="1" version_string="0.9"><![CDATA[This will be resized automatically to use in various places.]]></phrase>
+    <phrase title="arcade_image_explain_with_image" version_id="1" version_string="0.9"><![CDATA[Select an image to replace current one:<br />{image}]]></phrase>
+    <phrase title="arcade_instruction" version_id="1" version_string="0.9"><![CDATA[Instruction]]></phrase>
+    <phrase title="arcade_instruction_explain" version_id="1" version_string="0.0.1"><![CDATA[Enter the instructions on how to play the game.  ]]></phrase>
+    <phrase title="arcade_invalid_category" version_id="1" version_string="0.9"><![CDATA[Invalid category specified.]]></phrase>
+    <phrase title="arcade_new" version_id="1" version_string="0.9"><![CDATA[New]]></phrase>
+    <phrase title="arcade_not_recommend" version_id="1" version_string="0.9"><![CDATA[Not Recommend]]></phrase>
+    <phrase title="arcade_no_champion_yet" version_id="1" version_string="0.9"><![CDATA[Not yet]]></phrase>
+    <phrase title="arcade_no_game_to_display" version_id="1" version_string="0.9"><![CDATA[There is no game to display.]]></phrase>
+    <phrase title="arcade_personal_best" version_id="1" version_string="0.9"><![CDATA[Personal Best]]></phrase>
+    <phrase title="arcade_play" version_id="5" version_string="0.0.5"><![CDATA[Play]]></phrase>
+    <phrase title="arcade_play_game" version_id="5" version_string="0.0.5"><![CDATA[Play Game]]></phrase>
+    <phrase title="arcade_please_confirm_that_you_want_to_delete_following_category" version_id="1" version_string="0.0.1"><![CDATA[Please confirm that you want to delete the following category:]]></phrase>
+    <phrase title="arcade_please_confirm_that_you_want_to_delete_following_game" version_id="1" version_string="0.0.1"><![CDATA[Please confirm that you want to delete the following game:]]></phrase>
+    <phrase title="arcade_please_select_your_vote" version_id="1" version_string="0.9"><![CDATA[Please select your vote]]></phrase>
+    <phrase title="arcade_random" version_id="1" version_string="0.9"><![CDATA[Random]]></phrase>
+    <phrase title="arcade_recommend" version_id="1" version_string="0.9"><![CDATA[Recommend]]></phrase>
+    <phrase title="arcade_save_category" version_id="1" version_string="0.9"><![CDATA[Save Category]]></phrase>
+    <phrase title="arcade_save_game" version_id="1" version_string="0.9"><![CDATA[Save Game]]></phrase>
+    <phrase title="arcade_score" version_id="1" version_string="0.9"><![CDATA[Score]]></phrase>
+    <phrase title="arcade_showing_games_x_to_y_of_z" version_id="1" version_string="0.9"><![CDATA[Showing games {start} to {end} of {total}]]></phrase>
+    <phrase title="arcade_slug" version_id="1" version_string="0.9"><![CDATA[Slug]]></phrase>
+    <phrase title="arcade_slug_explain" version_id="5" version_string="0.0.5"><![CDATA[This is the unique identifier for game.  This is normally the name of the game's flash .swf without the extension.  For example, if the .swf file is named "buster.swf" then "buster" is the Slug value.  <b>NOTE: THIS VALUE IS CASE SENSITIVE!</b>  Your scores will not be saved if the Slug value is incorrect.]]></phrase>
+    <phrase title="arcade_slug_must_be_unique" version_id="1" version_string="0.9"><![CDATA[Game Slug must be unique. The specified slug is already in use.]]></phrase>
+    <phrase title="arcade_specified_system_not_found_x" version_id="1" version_string="0.9"><![CDATA[The specified system could not be found: {system_id}]]></phrase>
+    <phrase title="arcade_status_playing" version_id="8" version_string="0.0.8"><![CDATA[Playing Arcade Game]]></phrase>
+    <phrase title="arcade_status_viewing" version_id="5" version_string="0.0.5"><![CDATA[Viewing the Arcade]]></phrase>
+    <phrase title="arcade_status_viewing_category" version_id="5" version_string="0.0.5"><![CDATA[Viewing games in an Arcade category]]></phrase>
+    <phrase title="arcade_system" version_id="1" version_string="0.9"><![CDATA[System]]></phrase>
+    <phrase title="arcade_system_ipb_option_files" version_id="1" version_string="0.9"><![CDATA[Additional Files]]></phrase>
+    <phrase title="arcade_system_ipb_option_files_explain" version_id="1" version_string="0.0.1"><![CDATA[IPB v3 & IPV v32 games typically have additional files that are needed for the game to fully functional.  These additional files are normally located in a folder named "gamedata" within the game's download file.  Browse your local PC and locate the "gamedata" folder for the game you are adding.  Depending upon the exact type of game there may be several files such as "{slug}.xml" & "{slug}.txt" where {slug} matches the Slug value entered above.  For v32 games there will also be a file named "v32game.txt" in the same folder.  Upload all of the files except for "index.htm" if there is one present.  The file "index.htm" is not need for the operations of the game.  These additional files are stored in the XF database.]]></phrase>
+    <phrase title="arcade_system_option_explain" version_id="1" version_string="0.0.1"><![CDATA[Select the game's arcade type.  If you are adding a v3 Arcade game select the "Core" option.  If you are adding an IPB game select the "IPB" option.  
+]]></phrase>
+    <phrase title="arcade_system_option_height_explain" version_id="1" version_string="0.9"><![CDATA[Height of the player.]]></phrase>
+    <phrase title="arcade_system_option_height_title" version_id="1" version_string="0.9"><![CDATA[Height]]></phrase>
+    <phrase title="arcade_system_option_target" version_id="10001" version_string="1.0.1"><![CDATA[Game .SWF File]]></phrase>
+    <phrase title="arcade_system_option_target_explain" version_id="1" version_string="0.0.1"><![CDATA[Browse your local PC and locate the flash (.swf) for the game you are adding.  There is typically only one .swf file per game named "{slug}.swf" where {slug} matches the Slug value entered above.  This file is saved as a physical file on your server.]]></phrase>
+    <phrase title="arcade_system_option_width_explain" version_id="1" version_string="0.9"><![CDATA[Width of the player.]]></phrase>
+    <phrase title="arcade_system_option_width_title" version_id="1" version_string="0.9"><![CDATA[Width]]></phrase>
+    <phrase title="arcade_target_found" version_id="1" version_string="0.9"><![CDATA[Target found: {target}.]]></phrase>
+    <phrase title="arcade_target_must_be_swf" version_id="1" version_string="0.9"><![CDATA[Target must be SWF file.]]></phrase>
+    <phrase title="arcade_title" version_id="1" version_string="0.9"><![CDATA[Game Title]]></phrase>
+    <phrase title="arcade_title_explain" version_id="1" version_string="0.0.1"><![CDATA[Enter the name of the game.]]></phrase>
+    <phrase title="arcade_vote" version_id="1" version_string="0.9"><![CDATA[Vote]]></phrase>
+    <phrase title="arcade_your_rank" version_id="1" version_string="0.9"><![CDATA[Your Rank]]></phrase>
+    <phrase title="arcade_your_score" version_id="1" version_string="0.9"><![CDATA[Your Score]]></phrase>
+    <phrase title="arcade_you_are_the_champion" version_id="1" version_string="0.9"><![CDATA[The Champion!]]></phrase>
+    <phrase title="arcade_you_have_already_voted_this" version_id="1" version_string="0.9"><![CDATA[You have already voted this.]]></phrase>
+    <phrase title="arcade_you_have_not_played_yet" version_id="1" version_string="0.9"><![CDATA[You haven't tried it yet]]></phrase>
+    <phrase title="game_id_user_id" version_id="1" version_string="0.9"><![CDATA[Target]]></phrase>
+    <phrase title="option_group_xfarcade" version_id="1" version_string="0.9"><![CDATA[XF Arcade]]></phrase>
+    <phrase title="option_group_xfarcade_description" version_id="1" version_string="0.9"><![CDATA[Settings that control the displaying of games, scores, and soon a sidebar block of newest champion.]]></phrase>
+    <phrase title="option_xfarcade_champion" version_id="10001" version_string="1.0.1"><![CDATA[Enable Champion Seal?]]></phrase>
+    <phrase title="option_xfarcade_champion_explain" version_id="10001" version_string="1.0.1"><![CDATA[Enable the champion seal to be displayed in the postbit?]]></phrase>
+    <phrase title="option_xfarcade_disabled_message" version_id="1" version_string="0.9"><![CDATA[Disabled Message]]></phrase>
+    <phrase title="option_xfarcade_disabled_message_explain" version_id="1" version_string="0.9"><![CDATA[Provide a brief message to your users of reasons the system may be down or not live at the moment.]]></phrase>
+    <phrase title="option_xfarcade_enable" version_id="1" version_string="0.9"><![CDATA[System Live?]]></phrase>
+    <phrase title="option_xfarcade_enable_explain" version_id="1" version_string="0.9"><![CDATA[Arcade system active?]]></phrase>
+    <phrase title="option_xfarcade_image_path" version_id="10001" version_string="1.0.1"><![CDATA[Champion Seal Image Path]]></phrase>
+    <phrase title="option_xfarcade_image_path_explain" version_id="10001" version_string="1.0.1"><![CDATA[Enter the champion seal image path.<br />
+<br />
+NOTE: Format - 'images/image.png' without the quotes]]></phrase>
+    <phrase title="option_xfarcade_pc_message" version_id="10001" version_string="1.0.1"><![CDATA[Personal Conversation Message]]></phrase>
+    <phrase title="option_xfarcade_pc_message_explain" version_id="10001" version_string="1.0.1"><![CDATA[Enter the message you wish to have included with the notification upon champion status being beat.<br /><br />
+NOTE: You can use BBCode]]></phrase>
+    <phrase title="option_xfarcade_pc_title" version_id="10001" version_string="1.0.1"><![CDATA[Personal Conversation Title]]></phrase>
+    <phrase title="option_xfarcade_pc_title_explain" version_id="10001" version_string="1.0.1"><![CDATA[Enter the title that will be seen when a user's score is beat and they receive a PC notification.]]></phrase>
+    <phrase title="option_xfarcade_play_display" version_id="1" version_string="0.9"><![CDATA[Game Display]]></phrase>
+    <phrase title="option_xfarcade_play_display_explain" version_id="1" version_string="0.9"><![CDATA[When playing you can have games display in an overlay form or on its own page.]]></phrase>
+    <phrase title="option_xfarcade_text" version_id="10001" version_string="1.0.1"><![CDATA[Enable Champion Text?]]></phrase>
+    <phrase title="option_xfarcade_text_explain" version_id="10001" version_string="1.0.1"><![CDATA[Enable the champion text? Champion seal must be enabled for this to work and you can not have Image Path filled out otherwise this will break.]]></phrase>
+    <phrase title="permission_group_xfarcade" version_id="1" version_string="0.9"><![CDATA[XF Arcade]]></phrase>
+    <phrase title="permission_interface_xfarcade" version_id="1" version_string="0.9"><![CDATA[XF Arcade]]></phrase>
+    <phrase title="permission_xfarcade_xfarcade_can_comment" version_id="1" version_string="0.9"><![CDATA[Can comment on games]]></phrase>
+    <phrase title="permission_xfarcade_xfarcade_can_use" version_id="5" version_string="0.0.5"><![CDATA[Can play games (requires View permission)]]></phrase>
+    <phrase title="permission_xfarcade_xfarcade_can_view" version_id="5" version_string="0.0.5"><![CDATA[Can view Arcade]]></phrase>
+    <phrase title="permission_xfarcade_xfarcade_can_vote" version_id="1" version_string="0.9"><![CDATA[Can vote]]></phrase>
+  </phrases>
+  <route_prefixes>
+    <route_type type="admin">
+      <prefix original_prefix="arcade" class="Arcade_Route_PrefixAdmin_Arcade" build_link="data_only"/>
+    </route_type>
+    <route_type type="public">
+      <prefix original_prefix="arcade" class="Arcade_Route_Prefix_Arcade" build_link="data_only"/>
+    </route_type>
+  </route_prefixes>
+  <style_properties/>
+  <templates>
+    <template title="arcade.css" version_id="8" version_string="0.0.8"><![CDATA[/** column style and width **/
+
+.gameList .sectionHeaders,
+.gameListItem {
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+	word-wrap: normal;
+}
+
+	.gameList .sectionHeaders dt,
+	.gameList .sectionHeaders dd,
+	.gameListItem .listBlock {
+		display: table-cell;
+		vertical-align: middle;
+	}
+
+		.gameList .image {
+			width: 48px;
+		}
+		
+		.gameList .theTitle {
+			width: auto;
+		}
+		
+		.gameList .champion {
+			width: 200px;
+			text-align: center;
+		}
+			.champion .avatarContainer {
+				float: left;
+				margin-left: 5px;
+				margin-top: 5px;
+			}
+			.champion .infoContainer {
+			}
+		
+		.gameList .personalBest {
+			width: 149px;
+                        text-align: center;
+		}
+
+
+/* column headers */
+
+.gameList .sectionHeaders {	
+	font-size: 11px;
+	color: {xen:property secondaryDarker};
+	background: {xen:property secondaryLighter} url('{xen:property imagePath}/xenforo/gradients/category-23px-light.png') repeat-x top;
+	padding: 5px 10px;
+	margin: 3px auto 0;
+	border-top: 1px solid {xen:property secondaryLighter};
+	border-bottom: 1px solid {xen:property secondaryLight};
+	
+	padding: 0;
+}
+	
+	.gameList .sectionHeaders span {
+		display: block;
+		padding: 5px;
+	}
+		
+/** IE <8 **/
+.gameList .sectionHeaders,
+.gameListItem                { *display: block; _vertical-align: bottom; }
+.gameList .sectionHeaders dt,
+.gameList .sectionHeaders dd,
+.gameListItem .listBlock     { *display: block; *float: left; }
+.gameListItem .listBlock     { _height: 52px; *min-height: 52px; } /* todo: should be calculation */
+.gameList .image             { *width: 5.98%; }
+.gameListItem .image         { *font-size: 0; }	
+.gameList .theTitle          { *width: 59.98%; }
+.gameList .champion          { *width: 14.97%; }	
+.gameList .personalBest      { *width: 14.97%; }
+.gameList .sectionHeaders dt,
+.gameList .sectionHeaders dd { *padding: 5px 0; }
+.gameList .sectionHeaders a,
+.gameList .sectionHeaders a span { *display: inline !important; *float: none !important; }
+
+/** main **/
+
+.gameListItem {
+	background-color: {xen:property contentBackground};
+	border-bottom: 1px solid {xen:property primaryLighterStill};
+}
+
+	/* sections, section widths */
+	
+	.gameListItem .image,		
+	.gameListItem .champion {
+		background: {xen:property primaryLightest} url('{xen:property imagePath}/xenforo/gradients/category-23px-light.png') repeat-x top;
+	}
+	
+	.gameListItem .title,
+	.gameListItem .personalBest	{
+	}
+		
+	/* title, poster section */
+	
+	.gameListItem .titleText {
+		padding: 5px;
+		overflow: hidden; zoom: 1;
+	}
+	
+		/* first row */
+		.gameListItem .title {
+			font-size: 11pt;
+			float: left;
+		}
+		
+		/* second row */
+		
+		.gameListItem .secondRow {
+			font-size: 11px;
+			clear: both;
+		}
+			
+			.gameListItem .secondRow .controls {
+				float: right;
+				padding-left: 20px;
+			}
+				
+				.gameListItem.AjaxProgress .controls {
+					background: transparent url('{xen:property imagePath}/xenforo/widgets/ajaxload.info_B4B4DC_facebook.gif') no-repeat left center;
+				}
+
+/** bottom summary **/
+
+.gameList .sectionFooter {
+	overflow: hidden; zoom: 1;
+}
+
+	.gameList .sectionFooter .contentSummary {
+		float: left;
+		display: block;
+	}
+	
+/* home */
+#arcadeHome .tabs {
+	height: 27px;
+	border-bottom: 0;
+}
+
+#arcadeHome .tabs li a {
+	font-size: 20px;
+	color: {xen:property primaryLightish};
+	padding: 5px 10px;
+}
+	
+/* GameVote */
+a.GameVoteLink.GameVoted {
+	font-weight: bold;
+}]]></template>
+    <template title="arcade_category_browse" version_id="1" version_string="0.9"><![CDATA[<xen:title>{xen:phrase arcade_category} {$category.title}</xen:title>
+<xen:h1>{$category.title}</xen:h1>
+
+
+<xen:navigation>
+	<xen:breadcrumb href="{xen:link full:arcade/browse, $category}">{$category.title}</xen:breadcrumb>
+</xen:navigation>
+
+<div class="<xen:if is="{$inTab}">x</xen:if>sectionMain">
+	<xen:include template="arcade_game_list" />
+</div>]]></template>
+    <template title="arcade_copyright" version_id="5" version_string="0.0.5"><![CDATA[<xen:if is="{$controllerName} == 'Arcade_ControllerPublic_Arcade'">
+<li>&nbsp;{xen:phrase arcade_copyright}</li>
+</xen:if>
+]]></template>
+    <template title="arcade_game_list" version_id="1" version_string="0.9"><![CDATA[<xen:require css="arcade.css" />
+
+<form action="<xen:if is="{$category}">{xen:link 'arcade/browse', $category}<xen:else />{xen:link arcade}</xen:if>" method="post" class="gameList">
+	<br /><dl class="sectionHeaders">
+		<dt class="image">&nbsp;</dt>
+		<dd class="theTitle"><span>{xen:phrase arcade_title}</span></dd>
+		<dd class="champion">{xen:phrase arcade_champion}</dd>
+		<dd class="personalBest">{xen:phrase arcade_personal_best}</dd>
+	</dl>
+
+	<ol class="gameListItems">
+	<xen:if is="{$games}">
+		<xen:foreach loop="$games" value="$game">
+			<xen:include template="arcade_game_list_item" />
+		</xen:foreach>
+	<xen:else />
+		<li class="primaryContent">{xen:phrase arcade_no_game_to_display}</li>
+	</xen:if>
+	</ol>
+
+	<xen:if is="{$totalGames}">
+		<div class="sectionFooter InlineMod SelectionCountContainer">
+			<span class="contentSummary">{xen:phrase arcade_showing_games_x_to_y_of_z, 'start={xen:number $gameStartOffset}', 'end={xen:number $gameEndOffset}', 'total={xen:number $totalGames}'}</span>
+		</div>
+	</xen:if>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>
+
+<xen:if is="{$category} AND {$totalGames}">
+	<xen:pagenav link="arcade/browse" linkdata="{$category}" page="{$page}" perpage="{$gamesPerPage}" total="{$totalGames}" />
+</xen:if>]]></template>
+    <template title="arcade_game_list_item" version_id="7" version_string="0.0.7"><![CDATA[<xen:require css="arcade.css" />
+
+<li class="gameListItem">
+	<div class="listBlock image">
+		<xen:if is="{$game.images.m}">
+		<img src="{$game.images.m}" />
+		</xen:if>
+	</div>
+
+	<div class="listBlock theTitle">
+		<div class="titleText">
+			<h3 class="title">
+				<xen:if is="{$xenOptions.xfarcade_play_display} == 1">
+					<a href="{xen:link 'arcade/play', $game}">{$game.title}</a>
+				<xen:else />
+					<a class="OverlayTrigger" href="{xen:link 'arcade/play', $game}">{$game.title}</a>
+				</xen:if>
+			</h3>
+
+			<div class="secondRow">
+				{$game.description}
+				<div class="controls faint">
+					<a href="{xen:link 'full:arcade/browse', {xen:array 'category_id={$game.category_id}', 'title={$game.category_title}'}}" class="EditControl">{$game.category_title}</a>
+					<xen:if is="{$canVote}">
+						/
+						<xen:include template="arcade_game_vote" />
+					</xen:if>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="listBlock champion">
+		<xen:if is="{$game.highscore_user_id}">
+			<div class="avatarContainer">
+			<xen:avatar user="$game" size="s" img="true" />
+			</div>
+			<div class="infoContainer">
+				<xen:username user="$game" /><br />
+				{xen:phrase arcade_score}: {xen:number {$game.highscore}}<br />
+				<span class="muted">{xen:date {$game.highscore_date}}</span>
+			</div>
+		<xen:else />
+			{xen:phrase arcade_no_champion_yet}
+		</xen:if>
+	</div>
+
+	<div class="listBlock personalBest">
+		<div class="infoContainer">
+		<xen:if is="{$game.played_date}">
+			<div class="titleText">
+				{xen:phrase arcade_your_score}: {xen:number {$game.played_score}}<br />
+				<xen:if is="{$game.played_rank} == 1">{xen:phrase arcade_you_are_the_champion}<xen:else />{xen:phrase arcade_your_rank}: {xen:number {$game.played_rank}}</xen:if>
+			</div>
+		<xen:else />
+			<div class="titleText">{xen:phrase arcade_you_have_not_played_yet}</div>
+		</xen:if>
+		</div>
+	</div>
+</li>]]></template>
+    <template title="arcade_game_vote" version_id="1" version_string="0.9"><![CDATA[<xen:require js="js/arcade/frontend.js" />
+
+<span class="game-vote-{$game.game_id}" data-votedMessage="{xen:phrase arcade_you_have_already_voted_this}">
+<a href="{xen:link 'arcade/vote', $game, "d=up"}" class="GameVoteLink<xen:if is="{$game.voted_up}"> GameVoted</xen:if>" data-gameId="{$game.game_id}">
+{xen:number {$game.vote_up}}
+{xen:phrase arcade_recommend}
+</a>
+-
+<a href="{xen:link 'arcade/vote', $game, "d=down"}" class="GameVoteLink<xen:if is="{$game.voted_date} AND !{$game.voted_up}"> GameVoted</xen:if>" data-gameId="{$game.game_id}">
+{xen:number {$game.vote_down}}
+{xen:phrase arcade_not_recommend}
+</a>
+</span>]]></template>
+    <template title="arcade_index" version_id="7" version_string="0.0.7"><![CDATA[<xen:require css="arcade.css" />
+
+<xen:title>{xen:phrase arcade}</xen:title>
+<xen:h1>{xen:phrase arcade}</xen:h1>
+
+<div id="arcadeHome" class="sectionMain">
+<xen:if is="{$xenOptions.xfarcade_enable}">
+	<ul class="tabs Tabs" data-panes="#GameCategories > li" data-history="on">
+		<li><a href="{$requestPaths.requestUri}#all">{xen:phrase arcade_all}</a></li>
+		<li><a href="{$requestPaths.requestUri}#new">{xen:phrase arcade_new}</a></li>
+		<li><a href="{$requestPaths.requestUri}#random">{xen:phrase arcade_random}</a></li>
+		<xen:foreach loop="$categories" value="$category">
+		<li><a href="{$requestPaths.requestUri}#category-{$category.category_id}">{$category.title}</a></li>
+		</xen:foreach>
+	</ul>
+	
+	<ul id="GameCategories">
+		<li id="all">
+			<xen:include template="arcade_game_list">
+				<xen:map from="$allGames" to="$games" />
+			</xen:include>
+		</li>
+		<li id="new">
+			<xen:include template="arcade_game_list">
+				<xen:map from="$newGames" to="$games" />
+			</xen:include>
+		</li>
+		<li id="random">
+			<xen:include template="arcade_game_list">
+				<xen:map from="$randomGames" to="$games" />
+			</xen:include>
+		</li>
+		<xen:foreach loop="$categories" value="$category">
+		<li id="category-{$category.category_id}" data-loadUrl="{xen:link arcade/browse, $category}">
+			{xen:phrase loading}...
+			<noscript><a href="{xen:link arcade/browse, $category}">{xen:phrase view}</a></noscript>
+		</li>
+		</xen:foreach>
+	</ul>
+<xen:else />
+{$xenOptions.xfarcade_disabled_message}
+</xen:if>
+</div>]]></template>
+    <template title="arcade_links" version_id="1" version_string="0.9"><![CDATA[<ul class="secondaryContent blockLinksList">
+	<xen:foreach loop="$links" key="$href" value="$title">
+	<li><a href="{$href}">{$title}</a></li>
+	</xen:foreach>
+</ul>]]></template>
+    <template title="arcade_play" version_id="2" version_string="0.0.2"><![CDATA[<xen:title>{xen:phrase arcade_play} {$game.title}</xen:title>
+<xen:h1>{$game.title}</xen:h1>
+
+<xen:description>
+	{$game.description}
+</xen:description>
+
+<xen:navigation>
+	<xen:breadcrumb href="{xen:link full:arcade/browse, $category}">{$category.title}</xen:breadcrumb>
+	<xen:breadcrumb href="{xen:link full:arcade/play, $game}">{$game.title}</xen:breadcrumb>
+</xen:navigation>
+
+<xen:if is="{$xenOptions.xfarcade_play_display} == 1">
+	<div class="sectionMain">
+<xen:else />
+	<div class="xenForm sectionMain">
+</xen:if>
+
+<div class="actionList">
+{xen:raw $player}
+</div>
+
+</div>]]></template>
+    <template title="arcade_player_core" version_id="1" version_string="0.9"><![CDATA[<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+	codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,14,0"
+	width="{$game.system_options.width}"
+	height="{$game.system_options.height}"
+	id="game_object">
+	<param name="movie" value="{$targetUrl}" />
+	<param name="quality" value="high" />
+	<embed src="{$targetUrl}"
+		width="{$game.system_options.width}"
+		height="{$game.system_options.height}"
+		id="game_embedobj"
+		quality="high"
+		pluginspage="http://www.macromedia.com/go/getflashplayer"
+		type="application/x-shockwave-flash"></embed>
+</object>]]></template>
+    <template title="arcade_player_ipb" version_id="1" version_string="0.9"><![CDATA[<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+	codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,14,0"
+	width="{$game.system_options.width}"
+	height="{$game.system_options.height}"
+	id="game_object">
+	<param name="movie" value="{$targetUrl}" />
+	<param name="quality" value="high" />
+	<embed src="{$targetUrl}"
+		width="{$game.system_options.width}"
+		height="{$game.system_options.height}"
+		id="game_embedobj"
+		quality="high"
+		pluginspage="http://www.macromedia.com/go/getflashplayer"
+		type="application/x-shockwave-flash"></embed>
+</object>]]></template>
+    <template title="arcade_post_champion_seal" version_id="2" version_string="0.0.2"><![CDATA[<xen:if is="{$post.champion}">
+<dl class="pairsInline"><dt>:){xen:raw $post.champion}</dt></dl>
+</xen:if>]]></template>
+    <template title="arcade_vote" version_id="1" version_string="0.9"><![CDATA[<xen:if is="{$game.voted_date}">
+	<xen:title>{xen:phrase arcade_change_vote}</xen:title>
+<xen:else />
+	<xen:title>{xen:phrase arcade_vote}</xen:title>
+</xen:if>
+
+<xen:navigation>
+	<xen:breadcrumb href="{xen:link arcade/browse, {xen:array "category_id={$game.category_id}"}}">{$game.category_title}</xen:breadcrumb>
+	<xen:breadcrumb href="{xen:link arcade/view, $game}">{$game.title}</xen:breadcrumb>
+</xen:navigation>
+
+<form action="{xen:link 'arcade/vote', $game}" method="post" class="xenForm formOverlay">
+	<dl class="ctrlUnit">
+		<dt><label>{xen:phrase arcade_please_select_your_vote}</label></dt>
+		<dd>
+			<ul>
+				<li>
+					<label for="ctrl_vote_up">
+						<input type="radio" name="d" value="up" id="ctrl_vote_up" {xen:checked "{$d} == 'up'"}/>
+						{xen:phrase arcade_recommend}
+					</label>
+				</li>
+				<li>
+					<label for="ctrl_vote_down">
+						<input type="radio" name="d" value="down" id="ctrl_vote_down" {xen:checked "{$d} == 'down'"}/>
+						{xen:phrase arcade_not_recommend}
+					</label>
+				</li>
+			</ul>
+		</dd>
+	</dl>
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd>
+			<input type="submit" value="<xen:if is="{$game.voted_date}">{xen:phrase arcade_change_vote}<xen:else />{xen:phrase arcade_vote}</xen:if>" class="button primary" />
+		</dd>
+	</dl>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+	<input type="hidden" name="_xfConfirm" value="1" />
+</form>]]></template>
+  </templates>
+  <bb_code_media_sites/>
+</addon>

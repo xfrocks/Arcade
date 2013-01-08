@@ -1,0 +1,1 @@
+&scoreVar=_root.tally.score&blah=1
