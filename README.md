@@ -1,4 +1,4 @@
-XFArcade
-========
+XFArcade (http://XFArcade.com)
+==============================
+Arcade for XenForo.com
 
-Arcade for XenForo
