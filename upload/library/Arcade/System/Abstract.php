@@ -50,7 +50,7 @@ abstract class Arcade_System_Abstract extends Arcade_System {
 		$target = XenForo_Upload::getUploadedFile('target');
 		if (!empty($target)) {
 			$fileName = $target->getFileName();
-			$ext = strtolower(substr($fileName, strrpos($fileName, '.') + 1));
+			$ext = XenForo_Helper_File::getFileExtension($fileName);
 			if ($ext !== 'swf') {
 				throw new XenForo_Exception(new XenForo_Phrase('arcade_target_must_be_swf'), true);
 			}
@@ -62,6 +62,34 @@ abstract class Arcade_System_Abstract extends Arcade_System {
 		return $options;
 	}
 	
+	public function detectGameOptions($dir, array &$gameInfo) {
+		if (!isset($gameInfo['system_options'])) {
+			$gameInfo['system_options'] = array();
+		}
+		
+		if (!empty($gameInfo['slug']) AND empty($gameInfo['_target'])) {
+			$targetFilePath = Arcade_Helper_File::buildPath($dir, $gameInfo['slug'] . '.swf');
+			
+			if (file_exists($targetFilePath)) {
+				$gameInfo['_target'] = $targetFilePath;
+			}
+		}
+		
+		parent::detectGameOptions($dir, $gameInfo);
+	}
+	
+	public function processImport($dir, array &$gameInfo, Arcade_DataWriter_Game $dw) {
+		if (!empty($gameInfo['_target'])) {
+			$target = new XenForo_Upload(basename($gameInfo['_target']), $gameInfo['_target']);
+			
+			$gameInfo['system_options']['target_date'] = XenForo_Application::$time;
+			
+			$dw->setExtraData(self::DATA_WRITER_TARGET_EXTRA_DATA_KEY, $target);
+		}
+		
+		return parent::processImport($dir, $gameInfo, $dw);
+	}
+	
 	public function doPostSave(XenForo_DataWriter $dw) {
 		parent::doPostSave($dw);
 		
@@ -71,27 +99,24 @@ abstract class Arcade_System_Abstract extends Arcade_System {
 		$target = $dw->getExtraData(self::DATA_WRITER_TARGET_EXTRA_DATA_KEY);
 		if (!empty($target)) {
 			$filePath = $this->getTargetFilePath($data);
-			$directory = dirname($filePath);
-
-			if (XenForo_Helper_File::createDirectory($directory, true) && is_writable($directory)) {
-				if (file_exists($filePath)) {
-					unlink($filePath);
-				}
-				
-				$success = @rename($target->getTempFile(), $filePath);
-				if ($success) {
-					XenForo_Helper_File::makeWritableByFtpUser($filePath);
-				}
-			}
+			
+			Arcade_Helper_File::moveFile(
+				$target->getTempFile(),
+				$filePath
+			);
 			
 			if ($dw->isUpdate()) {
 				$oldFilePath = $this->getTargetFilePath($existingData);
-				if (!empty($oldFilePath) AND $oldFilePath != $filePath) @unlink($oldFilePath);
+				if ($oldFilePath != $filePath) {
+					Arcade_Helper_File::cleanUp($oldFilePath);
+				}
 			}
 		} elseif ($dw->isChanged('slug') AND $dw->isUpdate()) {
 			$oldFilePath = $this->getTargetFilePath($existingData);
 			$newFilePath = $this->getTargetFilePath($data);
-			if (!empty($oldFilePath) AND !empty($newFilePath)) @rename($oldFilePath, $newFilePath);
+			if ($oldFilePath != $newFilePath) {
+				Arcade_Helper_File::moveFile($oldFilePath, $newFilePath);
+			}
 		}
 	}
 	
@@ -100,7 +125,7 @@ abstract class Arcade_System_Abstract extends Arcade_System {
 		
 		$existingData = $dw->getMergedExistingData();
 		$oldFilePath = $this->getTargetFilePath($existingData);
-		@unlink($oldFilePath);
+		Arcade_Helper_File::cleanUp($oldFilePath);
 	}
 	
 	public function doInterfaceUpdate(array &$output, array $params) {
@@ -147,7 +172,7 @@ abstract class Arcade_System_Abstract extends Arcade_System {
 		$internal = self::_getTargetInternal($game);
 		
 		if (!empty($internal)) {
-			return XenForo_Application::$externalDataPath . $internal;
+			return XenForo_Application::$externalDataUrl . $internal;
 		} else {
 			return '';
 		}
@@ -160,11 +185,11 @@ abstract class Arcade_System_Abstract extends Arcade_System {
 		$group = floor($gameId / 100);
 		$slug = $game['slug'];
 		$options = $game['system_options'];
-		if (!is_array($options)) $options = unserialize($options);
+		if (!is_array($options)) $options = @unserialize($options);
 		$targetDate = isset($options['target_date']) ? $options['target_date'] : 0;
 		
 		if ($targetDate > 0) {
-			return "/games/$group/{$slug}.swf";
+			return "/games/{$group}/{$slug}.swf";
 		} else {
 			return '';
 		}

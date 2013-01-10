@@ -6,8 +6,8 @@ class Arcade_Route_Prefix_Arcade implements XenForo_Route_Interface {
 			// serve game data (IPB games)
 			$requested = substr($routePath, strlen($gamedata) + 1);
 			$parts = explode('/', $requested);
-			if (count($parts) == 2) {
-				$first = $parts[0];
+			if (count($parts) >= 2) {
+				$first = array_shift($parts);
 				$firstParts = explode('_', $first);
 				$countFirstParts = count($firstParts);
 				if ($countFirstParts > 2
@@ -18,7 +18,7 @@ class Arcade_Route_Prefix_Arcade implements XenForo_Route_Interface {
 				}
 				$slug = implode('_', $firstParts);
 
-				$file = $parts[1];
+				$file = implode('/', $parts);
 
 				$request->setParam('slug', $slug);
 				$request->setParam('file', $file);

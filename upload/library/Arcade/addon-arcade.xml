@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="arcade" title="XF Arcade" version_string="0.0.8" version_id="8" url="http://xfarcade.com" install_callback_class="Arcade_Installer" install_callback_method="install" uninstall_callback_class="Arcade_Installer" uninstall_callback_method="uninstall">
+<addon addon_id="arcade" title="XF Arcade" version_string="0.0.8.1" version_id="9" url="http://xfarcade.com" install_callback_class="Arcade_Installer" install_callback_method="install" uninstall_callback_class="Arcade_Installer" uninstall_callback_method="uninstall">
   <admin_navigation>
     <navigation navigation_id="arcade" parent_navigation_id="" display_order="21" link="arcade" admin_permission_id="arcade" debug_only="0" hide_no_children="1"/>
     <navigation navigation_id="arcade_categories" parent_navigation_id="arcade" display_order="2" link="arcade/categories" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
     <navigation navigation_id="arcade_game_add" parent_navigation_id="arcade_games" display_order="20" link="arcade/add-game" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
     <navigation navigation_id="arcade_game_list" parent_navigation_id="arcade_games" display_order="1" link="arcade/games" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
     <navigation navigation_id="arcade_games" parent_navigation_id="arcade" display_order="1" link="arcade/games" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="arcade_import" parent_navigation_id="arcade_games" display_order="9999" link="arcade/import" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
     <navigation navigation_id="arcade_options" parent_navigation_id="arcade" display_order="100" link="options/list/xfarcade" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
   </admin_navigation>
   <admin_permissions>
@@ -101,61 +102,16 @@
 	<input type="hidden" name="_xfConfirm" value="1" />
 </xen:form>]]></template>
     <template title="arcade_game_edit"><![CDATA[<xen:title>{xen:if '{$game.game_id}', '{xen:phrase arcade_edit_game}: {$game.title}', '{xen:phrase arcade_add_new_game}'}</xen:title>
-{xen:if '{$game.game_id}', '', '{xen:phrase arcade_add_new_game_explain}'}
+
+<xen:comment>{xen:if '{$game.game_id}', '', '{xen:phrase arcade_add_new_game_explain}'}</xen:comment>
+
 <xen:require js="js/arcade/functions.js" />
 
 <xen:form action="{xen:adminlink 'arcade/save-game'}" class="GameEditor" enctype="multipart/form-data">
-	<xen:textboxunit id="gameTitle" label="{xen:phrase arcade_title}" name="title" value="{$game.title}" data-liveTitleTemplate="{xen:if {$game.game_id},
-		'{xen:phrase arcade_edit_game}: <em>%s</em>',
-		'{xen:phrase arcade_add_new_game}: <em>%s</em>'}">
-		<xen:explain>{xen:phrase arcade_title_explain}</xen:explain>
-	</xen:textboxunit>
-	
-	<xen:textboxunit id="gameSlug" label="{xen:phrase arcade_slug}" name="slug" value="{$game.slug}">
-		<xen:explain>{xen:phrase arcade_slug_explain}</xen:explain>
-	</xen:textboxunit>
-	
-	<xen:textboxunit label="{xen:phrase arcade_description}" name="description" value="{$game.description}" inputclass="Elastic" rows="5">
-		<xen:explain>{xen:phrase arcade_description_explain}</xen:explain>
-	</xen:textboxunit>
-	
-	<xen:textboxunit label="{xen:phrase arcade_instruction}" name="instruction" value="{$game.instruction}" inputclass="Elastic" rows="5">
-		<xen:explain>{xen:phrase arcade_instruction_explain}</xen:explain>
-	</xen:textboxunit>
-	
-	<xen:selectunit label="{xen:phrase arcade_category}" name="category_id" value="{$game.category_id}">
-		<xen:options source="$categoriesSource" />
-		<xen:explain>{xen:phrase arcade_category_explain}</xen:explain>
-	</xen:selectunit>
-		
-	<fieldset>
-	<xen:selectunit label="{xen:phrase arcade_system}" name="system_id" value="{$game.system_id}"
-		inputclass="GameSystemOptions" data-optionsUrl="{xen:adminlink arcade/system-options}" data-optionsTarget="#GameSystemOptionsTarget">
-		<xen:option value=""></xen:option>
-		<xen:options source="$systemsSource" />	
-                <xen:html>
-                     <div id="GameSystemOptionsTarget">
-	                  <xen:include template="arcade_game_system_options" />
-        	     </div>
-                </xen:html>               
-                <xen:explain>{xen:if '{$game.game_id}', '', '{xen:phrase arcade_system_option_explain}'}</xen:explain>
-	</xen:selectunit>
-
-
-	
-	<xen:checkboxunit label="">
-		<xen:option name="reversed_scoring" selected="{$game.reversed_scoring}">{xen:phrase arcade_game_is_reversed_scoring}</xen:option>
-		<xen:explain>{xen:phrase arcade_game_is_reversed_scoring_explain}</xen:explain>
-	</xen:checkboxunit>
-	</fieldset>
-	
-	<xen:uploadunit label="{xen:phrase arcade_image}" name="image" value="">
-		<div id="imageHtml">{xen:if "{$game.image_date}", {xen:phrase arcade_image_explain_with_image, 'image=<img src="{$game.images.x}"/>'}, {xen:phrase arcade_image_explain}}</div>
-	</xen:uploadunit>
-	
-	<xen:checkboxunit label="">
-		<xen:option name="active" selected="{$game.active}">{xen:phrase arcade_game_is_active}</xen:option>
-	</xen:checkboxunit>
+	<xen:include template="arcade_game_edit_inputs">
+		<xen:set var="$inputPrefix">game</xen:set>
+	</xen:include>
+	<xen:edithint template="arcade_game_system_options" />
 
 	<xen:submitunit>
 		<input type="submit" name="reload" value="{xen:phrase arcade_save_game}" class="button primary" id="saveReloadButton"
@@ -171,6 +127,70 @@
 
 	<input id="gameId" type="hidden" name="game_id" value="{$game.game_id}" />
 </xen:form>]]></template>
+    <template title="arcade_game_edit_inputs"><![CDATA[<xen:if is="{$isImporting}">
+	<xen:textboxunit label="{xen:phrase arcade_title}" name="{$inputPrefix}[title]" value="{$game.title}">
+		<xen:explain>{xen:phrase arcade_title_explain}</xen:explain>
+	</xen:textboxunit>
+<xen:else />
+	<xen:textboxunit id="gameTitle" label="{xen:phrase arcade_title}" name="{$inputPrefix}[title]" value="{$game.title}" data-liveTitleTemplate="{xen:if {$game.game_id},
+		'{xen:phrase arcade_edit_game}: <em>%s</em>',
+		'{xen:phrase arcade_add_new_game}: <em>%s</em>'}">
+		<xen:explain>{xen:phrase arcade_title_explain}</xen:explain>
+	</xen:textboxunit>
+</xen:if>
+
+<xen:textboxunit id="gameSlug" label="{xen:phrase arcade_slug}" name="{$inputPrefix}[slug]" value="{$game.slug}">
+	<xen:explain>{xen:phrase arcade_slug_explain}</xen:explain>
+</xen:textboxunit>
+
+<xen:textboxunit label="{xen:phrase arcade_description}" name="{$inputPrefix}[description]" value="{$game.description}" inputclass="Elastic" rows="5">
+	<xen:explain>{xen:phrase arcade_description_explain}</xen:explain>
+</xen:textboxunit>
+
+<xen:textboxunit label="{xen:phrase arcade_instruction}" name="{$inputPrefix}[instruction]" value="{$game.instruction}" inputclass="Elastic" rows="5">
+	<xen:explain>{xen:phrase arcade_instruction_explain}</xen:explain>
+</xen:textboxunit>
+
+<xen:selectunit label="{xen:phrase arcade_category}" name="{$inputPrefix}[category_id]" value="{$game.category_id}">
+	<xen:options source="$categoriesSource" />
+	<xen:explain>{xen:phrase arcade_category_explain}</xen:explain>
+</xen:selectunit>
+	
+<xen:if is="!{$isImporting}"><fieldset></xen:if>
+	<xen:selectunit label="{xen:phrase arcade_system}" name="{$inputPrefix}[system_id]" value="{$game.system_id}"
+		inputclass="GameSystemOptions" data-optionsUrl="{xen:adminlink arcade/system-options}" data-optionsTarget="#GameSystemOptionsTarget">
+		<xen:option value=""></xen:option>
+		<xen:options source="$systemsSource" />	
+		<xen:explain>{xen:if '{$game.game_id}', '', '{xen:phrase arcade_system_option_explain}'}</xen:explain>
+	</xen:selectunit>
+	
+	<xen:if is="{$isImporting}">
+		<xen:comment>The system has (almost) full control during import so system options
+		interface is kind of useless for now. Temporary disable. If some system need 
+		to be configured during import, we may have to add some new method/callbacks</xen:comment>
+	<xen:else />
+		<div id="GameSystemOptionsTarget">
+			<xen:include template="arcade_game_system_options" />
+		</div>
+	</xen:if>
+
+	<xen:checkboxunit label="">
+		<xen:option name="{$inputPrefix}[reversed_scoring]" selected="{$game.reversed_scoring}">{xen:phrase arcade_game_is_reversed_scoring}</xen:option>
+		<xen:explain>{xen:phrase arcade_game_is_reversed_scoring_explain}</xen:explain>
+	</xen:checkboxunit>
+<xen:if is="!{$isImporting}"></fieldset></xen:if>
+
+<xen:if is="{$isImporting}">
+	<xen:comment>NO UPLOADING IN IMPORT MODE</xen:comment>
+<xen:else />
+	<xen:uploadunit label="{xen:phrase arcade_image}" name="image" value="">
+		<div id="imageHtml">{xen:if "{$game.image_date}", {xen:phrase arcade_image_explain_with_image, 'image=<img src="{$game.images.x}"/>'}, {xen:phrase arcade_image_explain}}</div>
+	</xen:uploadunit>
+</xen:if>
+
+<xen:checkboxunit label="">
+	<xen:option name="{$inputPrefix}[active]" selected="{$game.active}">{xen:phrase arcade_game_is_active}</xen:option>
+</xen:checkboxunit>]]></template>
     <template title="arcade_game_list"><![CDATA[<xen:title>{xen:phrase arcade_games}</xen:title>
 
 <xen:topctrl>
@@ -213,27 +233,58 @@
     <template title="arcade_game_system_options"><![CDATA[<input id="systemOptionsLoaded" type="hidden" name="system_options_loaded" value="{$system_options_loaded}" />
 
 <xen:foreach loop="$renderedOptions" value="$renderedOption">
-{xen:raw {$renderedOption}}
+	{xen:raw {$renderedOption}}
 </xen:foreach>
 
 {xen:raw $customizedOptions}]]></template>
-    <template title="arcade_system_core_options"><![CDATA[<xen:uploadunit label="{xen:phrase arcade_system_option_target}" name="target" value="">
-	<div id="targetHtml">{xen:if "{$targetFound}", {xen:phrase arcade_target_found, "target={$targetPath}"}}</div>
-</xen:uploadunit>
-<p class="explain">{xen:phrase arcade_system_option_target_explain}</p>]]></template>
-    <template title="arcade_system_ipb_options"><![CDATA[<xen:uploadunit label="{xen:phrase arcade_system_option_target}" name="target" value="">
-	<div id="targetHtml">{xen:if "{$targetFound}", {xen:phrase arcade_target_found, "target={$targetPath}"}}</div>
-</xen:uploadunit>
-<p class="explain">{xen:phrase arcade_system_option_target_explain}</p>
+    <template title="arcade_import_step1"><![CDATA[<xen:title>{xen:phrase arcade_import}</xen:title>
 
-<xen:uploadunit label="{xen:phrase arcade_system_ipb_option_files}" name="file" value="">
+<xen:form action="{xen:adminlink 'arcade/import'}" enctype="multipart/form-data">
+	
+	<xen:uploadunit label="{xen:phrase arcade_game_package}" name="package" />
+
+	<xen:submitunit save="{xen:phrase import}" />
+
+	<input type="hidden" name="_xfConfirm" value="1" />
+</xen:form>]]></template>
+    <template title="arcade_import_step2"><![CDATA[<xen:title>{xen:phrase arcade_import}</xen:title>
+
+<xen:form action="{xen:adminlink 'arcade/import'}">
+	
+	<xen:foreach loop="$gamesToBeImported" i="$i" key="$dir" value="$game">
+		<fieldset>
+			<input type="hidden" name="games[{$i}][dir]" value="{$dir}" />
+			
+			<xen:include template="arcade_game_edit_inputs">
+				<xen:set var="$inputPrefix">games[{$i}]</xen:set>
+				<xen:set var="$isImporting">1</xen:set>
+			</xen:include>
+		</fieldset>
+	</xen:foreach>
+
+	<xen:submitunit save="{xen:phrase import}" />
+
+	<input type="hidden" name="_xfConfirm" value="1" />
+	<xen:if is="{$gamesToBeImported}">
+		<input type="hidden" name="_sessionData" value="{xen:helper arcade_base64_encode, {xen:helper json, $gamesToBeImported}}" />
+	</xen:if>
+</xen:form>]]></template>
+    <template title="arcade_system_core_options"><![CDATA[<xen:uploadunit label="{xen:phrase arcade_system_option_target}" name="target" value="" explain="{xen:phrase arcade_system_option_target_explain}">
+	<div id="targetHtml">{xen:if "{$targetFound}", {xen:phrase arcade_target_found, "target={$targetPath}"}}</div>
+</xen:uploadunit>]]></template>
+    <template title="arcade_system_ipb_options"><![CDATA[<xen:uploadunit label="{xen:phrase arcade_system_option_target}" name="target" value="" explain="{xen:phrase arcade_system_option_target_explain}">
+	<div id="targetHtml">{xen:if "{$targetFound}", {xen:phrase arcade_target_found, "target={$targetPath}"}}</div>
+</xen:uploadunit>
+
+<xen:uploadunit label="{xen:phrase arcade_system_ipb_option_files}" name="file" value="" explain="{xen:phrase arcade_system_ipb_option_files_explain}">
 	<div id="fileHtml">{$additionalFiles}</div>
 </xen:uploadunit>
-<p class="explain">{xen:phrase arcade_system_ipb_option_files_explain}</p>
 ]]></template>
   </admin_templates>
   <code_events/>
   <code_event_listeners>
+    <listener event_id="file_health_check" execute_order="10" callback_class="Arcade_Listener" callback_method="file_health_check" active="1" description=""/>
+    <listener event_id="init_dependencies" execute_order="10" callback_class="Arcade_Listener" callback_method="init_dependencies" active="1" description=""/>
     <listener event_id="load_class_controller" execute_order="9999" callback_class="Arcade_Listener" callback_method="load_class" active="1" description=""/>
     <listener event_id="navigation_tabs" execute_order="10" callback_class="Arcade_Listener" callback_method="navigation_tabs" active="1" description="Add menu links"/>
     <listener event_id="template_hook" execute_order="20" callback_class="Arcade_Template_Hook" callback_method="template" active="1" description="Adds the champion seal if enabled."/>
@@ -312,6 +363,7 @@
     <phrase title="admin_navigation_arcade_games" version_id="1" version_string="0.9"><![CDATA[Games]]></phrase>
     <phrase title="admin_navigation_arcade_game_add" version_id="1" version_string="0.9"><![CDATA[Add New Game]]></phrase>
     <phrase title="admin_navigation_arcade_game_list" version_id="10001" version_string="1.0.1"><![CDATA[List Games]]></phrase>
+    <phrase title="admin_navigation_arcade_import" version_id="8" version_string="0.0.8"><![CDATA[Import]]></phrase>
     <phrase title="admin_navigation_arcade_options" version_id="1" version_string="0.0.1"><![CDATA[Options]]></phrase>
     <phrase title="admin_permission_arcade" version_id="1" version_string="0.0.1"><![CDATA[XF Arcade]]></phrase>
     <phrase title="arcade" global_cache="1" version_id="1" version_string="0.9"><![CDATA[Arcade]]></phrase>
@@ -344,10 +396,12 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_game_is_reversed_scoring" version_id="1" version_string="0.9"><![CDATA[is reversed scoring.]]></phrase>
     <phrase title="arcade_game_is_reversed_scoring_explain" version_id="1" version_string="0.9"><![CDATA[With normal games, the higher score the better. With reversed scoring games, the lower score the better.]]></phrase>
     <phrase title="arcade_game_not_found" version_id="1" version_string="0.9"><![CDATA[The requested game could not be found.]]></phrase>
+    <phrase title="arcade_game_package" version_id="8" version_string="0.0.8"><![CDATA[Game Package]]></phrase>
     <phrase title="arcade_game_saved_successfully" version_id="1" version_string="0.9"><![CDATA[Game has been saved successfully]]></phrase>
     <phrase title="arcade_image" version_id="1" version_string="0.9"><![CDATA[Image]]></phrase>
     <phrase title="arcade_image_explain" version_id="1" version_string="0.9"><![CDATA[This will be resized automatically to use in various places.]]></phrase>
     <phrase title="arcade_image_explain_with_image" version_id="1" version_string="0.9"><![CDATA[Select an image to replace current one:<br />{image}]]></phrase>
+    <phrase title="arcade_import" version_id="8" version_string="0.0.8"><![CDATA[Import Game]]></phrase>
     <phrase title="arcade_instruction" version_id="1" version_string="0.9"><![CDATA[Instruction]]></phrase>
     <phrase title="arcade_instruction_explain" version_id="1" version_string="0.0.1"><![CDATA[Enter the instructions on how to play the game.  ]]></phrase>
     <phrase title="arcade_invalid_category" version_id="1" version_string="0.9"><![CDATA[Invalid category specified.]]></phrase>
@@ -361,6 +415,7 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_please_confirm_that_you_want_to_delete_following_category" version_id="1" version_string="0.0.1"><![CDATA[Please confirm that you want to delete the following category:]]></phrase>
     <phrase title="arcade_please_confirm_that_you_want_to_delete_following_game" version_id="1" version_string="0.0.1"><![CDATA[Please confirm that you want to delete the following game:]]></phrase>
     <phrase title="arcade_please_select_your_vote" version_id="1" version_string="0.9"><![CDATA[Please select your vote]]></phrase>
+    <phrase title="arcade_please_upload_valid_game_package" version_id="8" version_string="0.0.8"><![CDATA[Please upload a valid game package file. The file should have the extension of "zip" or "tar".]]></phrase>
     <phrase title="arcade_random" version_id="1" version_string="0.9"><![CDATA[Random]]></phrase>
     <phrase title="arcade_recommend" version_id="1" version_string="0.9"><![CDATA[Recommend]]></phrase>
     <phrase title="arcade_save_category" version_id="1" version_string="0.9"><![CDATA[Save Category]]></phrase>

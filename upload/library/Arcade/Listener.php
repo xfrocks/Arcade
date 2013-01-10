@@ -26,4 +26,12 @@ class Arcade_Listener {
 			$extend[] = str_replace('XenForo_', 'Arcade_Extend_', $class);
 		}
 	}
+	
+	public static function init_dependencies(XenForo_Dependencies_Abstract $dependencies, array $data) {
+		XenForo_Template_Helper_Core::$helperCallbacks['arcade_base64_encode'] = 'base64_encode';
+	}
+	
+	public static function file_health_check(XenForo_ControllerAdmin_Abstract $controller, array &$hashes) {
+		$hashes += Arcade_FileSums::getHashes();
+	}
 }

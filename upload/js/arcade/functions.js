@@ -38,17 +38,28 @@
 
 			this.xhr = XenForo.ajax(
 				this.url,
-				{ 'system_id': this.$select.val(), 'game_id': $('#gameId').val() },
+				{
+					'system_id': this.$select.val(),
+					'game_id': $('#gameId').val()
+				},
 				$.context(this, 'ajaxSuccess'),
-				{ error: false }
+				{
+					error: false
+				}
 			);
 		},
 
 		ajaxSuccess: function(ajaxData) {
 			if (XenForo.hasResponseError(ajaxData)) return false;
-			
+
 			if (ajaxData) {
 				this.$target.html(ajaxData.templateHtml);
+
+				var $form = this.$target.parents('form');
+				var GameEditor = $form.data('GameEditor');
+				if (typeof GameEditor != 'undefined') {
+					this.$target.find('input:file').change($.context(GameEditor, 'uploadChange'));
+				}
 			} else {
 				this.$target.html('');
 			}
@@ -62,7 +73,7 @@
 			this.$form = $form;
 			this.$saveReloadButton = $('#saveReloadButton');
 			this.$saveExitButton = $('#saveExitButton');
-			this.$gameId    = $('#gameId');
+			this.$gameId = $('#gameId');
 			this.$imageButton = this.$form.find('.GameImageUploader');
 
 			if (this.useAjaxSave && this.getSaveUrl('json')) {
@@ -77,21 +88,22 @@
 			}
 			
 			this.initTitleAndSlug();
+			$form.data('GameEditor', this);
 		},
 
 		initTitleAndSlug: function() {
 			var $title = $('#gameTitle');
 			var $slug = $('#gameSlug');
 
-/*
-This function default the slug value to be a stripped out version of
-the title when adding/editing a game.  Nice idea but caused too many
-problems because the actual slug value is often different from the
-name of the game.
+			/*
+			This function default the slug value to be a stripped out version of
+			the title when adding/editing a game.  Nice idea but caused too many
+			problems because the actual slug value is often different from the
+			name of the game.
 			$title.keyup(function(e) {
 				$slug.val($title.val().toLowerCase().replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/ +/g, '-'));
 			});
-*/
+			*/
 		},
 		
 		uploadChange: function(e) {
@@ -161,7 +173,6 @@ name of the game.
 		},
 
 		saveAjax: function(e) {
-			
 			var hasFilePending = false;
 			var $files = this.$form.find('input[type=file]') // do this everytime because the form element is changed
 				.each(function() {
@@ -171,7 +182,7 @@ name of the game.
 					}
 				});
 			if (hasFilePending) return true;
-			
+
 			var postParams;
 
 			if (e) e.preventDefault();

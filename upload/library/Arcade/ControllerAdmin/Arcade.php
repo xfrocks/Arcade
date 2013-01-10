@@ -89,7 +89,9 @@ class Arcade_ControllerAdmin_Arcade extends XenForo_ControllerAdmin_Abstract {
 
 		$gameId = $this->_input->filterSingle('game_id', XenForo_Input::UINT);
 
-		$dwInput = $this->_input->filter(array(
+		$arrayGame = $this->_input->filterSingle('game', XenForo_Input::ARRAY_SIMPLE);
+		$inputGame = new XenForo_Input($arrayGame);
+		$dwInput = $inputGame->filter(array(
 			'slug' => XenForo_Input::STRING,
 			'title' => XenForo_Input::STRING,
 			'description' => XenForo_Input::STRING,
@@ -173,7 +175,7 @@ class Arcade_ControllerAdmin_Arcade extends XenForo_ControllerAdmin_Abstract {
 		} else {
 			$game = array();
 		}
-		$game['system_id'] = $this->_input->filterSingle('system_id', XenForo_Input::UINT);
+		$game['system_id'] = $this->_input->filterSingle('system_id', XenForo_Input::STRING);
 		
 		$viewParams = array(
 			'game' => $game,
@@ -256,6 +258,160 @@ class Arcade_ControllerAdmin_Arcade extends XenForo_ControllerAdmin_Abstract {
 			);
 
 			return $this->responseView('Arcade_ViewAdmin_Category_Delete', 'arcade_category_delete', $viewParams);
+		}
+	}
+	
+	public function actionImport() {
+		if ($this->isConfirmedPost()) {
+			$importModel = $this->getModelFromCache('Arcade_Model_Import');
+			$categoryModel = $this->_getCategoryModel();
+			$systemModel = $this->_getSystemModel();
+			
+			$gamesToBeImported = array();
+			$dwErrors = array();
+			$importedCount = 0;
+			
+			// process the uploaded package
+			$package = XenForo_Upload::getUploadedFile('package');
+			if (!empty($package)) {
+				$extracted = $importModel->extract($package);
+				if (empty($extracted)) {
+					return $this->responseError(new XenForo_Phrase('arcade_please_upload_valid_game_package'));
+				}
+
+				$childPackages = $importModel->findPackages($extracted);
+				if (!empty($childPackages)) {
+					// user uploaded an archive containing some game packages
+					foreach ($childPackages as $childPackage) {
+						$childExtracted = $importModel->extract($childPackage);
+						if (!empty($childExtracted)) {
+							$gamesToBeImported[$childExtracted] = array('active' => 1);
+						}
+					}
+					
+					// all child packages have been processed
+					// it's safe to delete the extracted directory now
+					Arcade_Helper_File::cleanUp($extracted);
+				} else {
+					// user uploaded a game package
+					$gamesToBeImported[$extracted] = array('active' => 1);
+				}
+			}
+			
+			// try to restore session data
+			$sessionData = $this->_input->filterSingle('_sessionData', XenForo_Input::STRING);
+			if (!empty($sessionData)) {
+				$sessionData = @base64_decode($sessionData);
+				if (!empty($sessionData)) {
+					$sessionData = @json_decode($sessionData, true);
+					if (!empty($sessionData)) {
+						foreach ($sessionData as $dir => $gameInfo) {
+							$gamesToBeImported[$dir] = $gameInfo;
+						}
+					}
+				}
+			}
+			
+			// go through form's inputs
+			$gamesInput = $this->_input->filterSingle('games', XenForo_Input::ARRAY_SIMPLE);
+			foreach ($gamesInput as $gameInput) {
+				if (empty($gameInput['dir'])) {
+					// all game input should contain the dir
+					// it is used to identify the extracted directory
+					// in the first step
+					continue;
+				}
+				
+				$dir = $gameInput['dir'];
+				unset($gameInput['dir']); // unset it to keep noise out of game info
+				if (empty($gamesToBeImported[$dir])) {
+					// unable to find the specified dir in session data...
+					continue;
+				}
+				
+				$refGame =& $gamesToBeImported[$dir];
+				foreach ($gameInput as $key => $value) {
+					$refGame[$key] = $value;
+				}
+			}
+			
+			// loop through games and try to process it
+			foreach (array_keys($gamesToBeImported) as $dir) {
+				$refGame =& $gamesToBeImported[$dir];
+				$refGame = $importModel->collectGameInfo($dir, $refGame);
+				
+				if (!empty($refGame['system_id'])) {
+					// only attempt to save the game when the game's system
+					// has been determined
+					$system = $systemModel->initSystem($refGame['system_id']);
+					
+					$dw = XenForo_DataWriter::create('Arcade_DataWriter_Game');
+					
+					$system->processImport($dir, $refGame, $dw);
+					
+					$dw->bulkSet($refGame, array('ignoreInvalidFields' => true));
+					
+					// active is a special input because checkbox doesn't get included
+					// if it's not checked so we have to go out of our way and validate it
+					if (!empty($refGame['active'])) {
+						$dw->set('active', 1);
+					} else {
+						$dw->set('active', 0);
+					}
+					
+					if (!empty($refGame['_image_path'])) {
+						$imagePath = $refGame['_image_path'];
+						$imageName = basename($imagePath);
+						$image = new XenForo_Upload($imageName, $imagePath);
+						if ($image->isImage()) {
+							$dw->addImage($image);
+						}
+					}
+					
+					$dw->preSave();
+					
+					if (!$dw->hasErrors()) {
+						// everything looks good
+						// save the game now
+						$dw->save();
+						
+						// then clean up the extracted directory
+						Arcade_Helper_File::cleanUp($dir);
+						
+						// also remove the game from to be imported list
+						unset($gamesToBeImported[$dir]);
+						
+						$importedCount++;
+					} else {
+						// debugging purpose
+						$dwErrors[$dir] = $dw->getErrors();
+					}
+				}
+			}
+			
+			if (!empty($gamesToBeImported)) {
+				// there are games awaiting to be imported
+				// they may have some missing piece of information
+				$categories = $categoryModel->getCategories(1);
+				$systems = $systemModel->getSystems();
+				
+				$viewParams = array(
+					'gamesToBeImported' => $gamesToBeImported,
+					'dwErrors' => $dwErrors,
+				
+					'categories' => $categories,
+					'systems' => $systems,
+				);
+				
+				return $this->responseView('Arcade_ViewAdmin_Import_Step2', 'arcade_import_step2', $viewParams);
+			} else {
+				return $this->responseRedirect(XenForo_ControllerResponse_Redirect::SUCCESS, XenForo_Link::buildAdminLink('arcade'));
+			}
+		} else {
+			$viewParams = array(
+			);
+			
+			return $this->responseView('Arcade_ViewAdmin_Import_Step1', 'arcade_import_step1', $viewParams);
 		}
 	}
 	

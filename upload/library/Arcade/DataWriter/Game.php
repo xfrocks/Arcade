@@ -185,8 +185,10 @@ class Arcade_DataWriter_Game extends XenForo_DataWriter {
 				if (!empty($oldFilePath) AND !empty($newFilePath)) @rename($oldFilePath, $newFilePath);
 			}
 		}
-		
-		$system = XenForo_Model::create('Arcade_Model_System')->initSystem($this->get('system_id'));
+	}
+	
+	protected function _postSaveAfterTransaction() {
+		$system = $this->_getSystemModel()->initSystem($this->get('system_id'));
 		$system->doPostSave($this);
 	}
 	
@@ -197,7 +199,7 @@ class Arcade_DataWriter_Game extends XenForo_DataWriter {
 			@unlink($filePath);
 		}
 		
-		$system = XenForo_Model::create('Arcade_Model_System')->initSystem($this->get('system_id'));
+		$system = $this->_getSystemModel()->initSystem($this->get('system_id'));
 		$system->doPostDelete($this);
 	}
 

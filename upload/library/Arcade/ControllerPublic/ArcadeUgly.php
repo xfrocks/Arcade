@@ -151,10 +151,22 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 
 		$game = $this->_getGameOrError($gameSlug);
 
-		$filePath = Arcade_System_IPB::getAdditionalFilePath($game, $fileName);
-
-		if (!empty($filePath)) {
-			echo file_get_contents($filePath);
+		$url = Arcade_System_IPB::getAdditionalUrl($game, $fileName);
+		if (!empty($url)) {
+			// simply redirect
+			header("Location: " . XenForo_Link::convertUriToAbsoluteUri($url));
+		} else {
+			$filePath = Arcade_System_IPB::getAdditionalFilePath($game, $fileName);
+			if (!empty($filePath) AND file_exists($filePath)) {
+				// sondh@2013-01-11
+				// dirty fix to support all kind of gamedata file types
+				// we can't use mime_content_type or Fileinfo because
+				// the real file doesn't always have the correct extension...
+				header("Content-Type: application/octet-stream");
+				echo file_get_contents($filePath);
+			} else {
+				// TODO: error?
+			}
 		}
 
 		exit;

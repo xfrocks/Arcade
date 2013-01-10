@@ -15,7 +15,7 @@ abstract class Arcade_System {
 			$preparedOption['title'] = $this->_getPhrase('option_' . $preparedOption['option_id'] . '_title');
 			$preparedOption['explain'] = $this->_getPhrase('option_' . $preparedOption['option_id'] . '_explain');
 			
-			$renderedOptions[$key] = XenForo_ViewAdmin_Helper_Option::renderPreparedOptionHtml($view, $preparedOption, false, self::_getFieldPrefix());
+			$renderedOptions[$key] = XenForo_ViewAdmin_Helper_Option::renderPreparedOptionHtml($view, $preparedOption, false, 'game_options');
 		}
 		
 		return $renderedOptions;
@@ -50,8 +50,8 @@ abstract class Arcade_System {
 	
 	public function processOptionsInput(XenForo_Input $inputObject, array $game, XenForo_DataWriter $dw) {
 		$input = $inputObject->filter(array(
-			self::_getFieldPrefix() => XenForo_Input::ARRAY_SIMPLE,
-		));		
+			'game_options' => XenForo_Input::ARRAY_SIMPLE,
+		));
 		$inputOptions = array_shift($input);
 		$availableOptions = $this->_getAvailableOptions();
 		$options = isset($game['system_options'])?$game['system_options']:array();
@@ -67,12 +67,20 @@ abstract class Arcade_System {
 		return $options;
 	}
 	
+	public function detectGameOptions($dir, array &$gameInfo) {
+		return true;
+	}
+	
+	public function processImport($dir, array &$gameInfo, Arcade_DataWriter_Game $dw) {
+		return true;
+	}
+	
 	public function doPostSave(XenForo_DataWriter $dw) {
-		return false;
+		return true;
 	}
 	
 	public function doPostDelete(XenForo_DataWriter $dw) {
-		return false;
+		return true;
 	}
 	
 	public function doInterfaceUpdate(array &$output, array $params) {
@@ -96,9 +104,5 @@ abstract class Arcade_System {
 		}
 
 		return new $createClass;
-	}
-	
-	protected static function _getFieldPrefix() {
-		return 'options';
 	}
 }
