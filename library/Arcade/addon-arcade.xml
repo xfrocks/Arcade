@@ -286,7 +286,7 @@
     <listener event_id="file_health_check" execute_order="10" callback_class="Arcade_Listener" callback_method="file_health_check" active="1" description=""/>
     <listener event_id="init_dependencies" execute_order="10" callback_class="Arcade_Listener" callback_method="init_dependencies" active="1" description=""/>
     <listener event_id="load_class_controller" execute_order="9999" callback_class="Arcade_Listener" callback_method="load_class" active="1" description=""/>
-    <listener event_id="navigation_tabs" execute_order="10" callback_class="Arcade_Listener" callback_method="navigation_tabs" active="1" description="Add menu links"/>
+    <listener event_id="navigation_tabs" execute_order="1000" callback_class="Arcade_Listener" callback_method="navigation_tabs" active="1" description="Add menu links"/>
     <listener event_id="template_hook" execute_order="20" callback_class="Arcade_Template_Hook" callback_method="template" active="1" description="Adds the champion seal if enabled."/>
   </code_event_listeners>
   <cron/>
@@ -398,6 +398,7 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_game_not_found" version_id="1" version_string="0.9"><![CDATA[The requested game could not be found.]]></phrase>
     <phrase title="arcade_game_package" version_id="8" version_string="0.0.8"><![CDATA[Game Package]]></phrase>
     <phrase title="arcade_game_saved_successfully" version_id="1" version_string="0.9"><![CDATA[Game has been saved successfully]]></phrase>
+    <phrase title="arcade_highscores" version_id="8" version_string="0.0.8"><![CDATA[Highscores]]></phrase>
     <phrase title="arcade_image" version_id="1" version_string="0.9"><![CDATA[Image]]></phrase>
     <phrase title="arcade_image_explain" version_id="1" version_string="0.9"><![CDATA[This will be resized automatically to use in various places.]]></phrase>
     <phrase title="arcade_image_explain_with_image" version_id="1" version_string="0.9"><![CDATA[Select an image to replace current one:<br />{image}]]></phrase>
@@ -407,7 +408,7 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_invalid_category" version_id="1" version_string="0.9"><![CDATA[Invalid category specified.]]></phrase>
     <phrase title="arcade_new" version_id="1" version_string="0.9"><![CDATA[New]]></phrase>
     <phrase title="arcade_not_recommend" version_id="1" version_string="0.9"><![CDATA[Not Recommend]]></phrase>
-    <phrase title="arcade_no_champion_yet" version_id="1" version_string="0.9"><![CDATA[Not yet]]></phrase>
+    <phrase title="arcade_no_champion_yet" version_id="1" version_string="0.9"><![CDATA[No one's played this yet]]></phrase>
     <phrase title="arcade_no_game_to_display" version_id="1" version_string="0.9"><![CDATA[There is no game to display.]]></phrase>
     <phrase title="arcade_personal_best" version_id="1" version_string="0.9"><![CDATA[Personal Best]]></phrase>
     <phrase title="arcade_play" version_id="5" version_string="0.0.5"><![CDATA[Play]]></phrase>
@@ -447,7 +448,7 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_vote" version_id="1" version_string="0.9"><![CDATA[Vote]]></phrase>
     <phrase title="arcade_your_rank" version_id="1" version_string="0.9"><![CDATA[Your Rank]]></phrase>
     <phrase title="arcade_your_score" version_id="1" version_string="0.9"><![CDATA[Your Score]]></phrase>
-    <phrase title="arcade_you_are_the_champion" version_id="1" version_string="0.9"><![CDATA[The Champion!]]></phrase>
+    <phrase title="arcade_you_are_the_champion" version_id="1" version_string="0.9"><![CDATA[You're the Champion!]]></phrase>
     <phrase title="arcade_you_have_already_voted_this" version_id="1" version_string="0.9"><![CDATA[You have already voted this.]]></phrase>
     <phrase title="arcade_you_have_not_played_yet" version_id="1" version_string="0.9"><![CDATA[You haven't tried it yet]]></phrase>
     <phrase title="game_id_user_id" version_id="1" version_string="0.9"><![CDATA[Target]]></phrase>
@@ -489,7 +490,7 @@ NOTE: You can use BBCode]]></phrase>
   </route_prefixes>
   <style_properties/>
   <templates>
-    <template title="arcade.css" version_id="8" version_string="0.0.8"><![CDATA[/** column style and width **/
+    <template title="arcade.css" version_id="9" version_string="0.0.8.1"><![CDATA[/** column style and width **/
 
 .gameList .sectionHeaders,
 .gameListItem {
@@ -641,7 +642,24 @@ NOTE: You can use BBCode]]></phrase>
 /* GameVote */
 a.GameVoteLink.GameVoted {
 	font-weight: bold;
-}]]></template>
+}
+
+/* dark mods */
+
+.gameListItem .image { line-height: 0; }
+.gameListItem .image, .gameListItem .champion { padding: 5px 0; }
+.gameListItem .title { font-size: 20px; }
+.scores { width: 300px; text-align: center; }
+.gameStats { width: 150px; text-align: center; }
+.gameListItem .personalBest { background: {xen:property primaryLightest} url('{xen:property imagePath}/xenforo/gradients/category-23px-light.png') repeat-x center top; }
+
+.highscores { list-style: decimal; font-size: 11px; margin: 5px auto; width: 200px; }
+.highscores td:first-child { color: #aaa; }
+.highscores .name { width: 140px; text-align: right; padding-right: 7px; overflow: hidden; }
+.highscores .datscore { text-align: left; }
+.gameListItem .secondRow { color: #999; }
+
+]]></template>
     <template title="arcade_category_browse" version_id="1" version_string="0.9"><![CDATA[<xen:title>{xen:phrase arcade_category} {$category.title}</xen:title>
 <xen:h1>{$category.title}</xen:h1>
 
@@ -660,10 +678,12 @@ a.GameVoteLink.GameVoted {
     <template title="arcade_game_list" version_id="1" version_string="0.9"><![CDATA[<xen:require css="arcade.css" />
 
 <form action="<xen:if is="{$category}">{xen:link 'arcade/browse', $category}<xen:else />{xen:link arcade}</xen:if>" method="post" class="gameList">
-	<br /><dl class="sectionHeaders">
+	<dl class="sectionHeaders">
 		<dt class="image">&nbsp;</dt>
+		<dd class="gameStats"></dd>
 		<dd class="theTitle"><span>{xen:phrase arcade_title}</span></dd>
 		<dd class="champion">{xen:phrase arcade_champion}</dd>
+		<dd class="scores">{xen:phrase arcade_highscores}</dd>
 		<dd class="personalBest">{xen:phrase arcade_personal_best}</dd>
 	</dl>
 
@@ -720,15 +740,24 @@ a.GameVoteLink.GameVoted {
 			</div>
 		</div>
 	</div>
-
+	
+	<div class="listBlock gameStats" style='font-size: 11px'>
+		<div class="infoContainer">
+		<xen:if is="{$game.last_play_date}">
+			<span class='muted'>Played </span>{xen:number $game.play_count}<span class='muted'> time<xen:if is="{$game.play_count} != 1">s</xen:if></span><br />
+			<span class='muted'>Last played: </span>{xen:date {$game.highscore_date}}
+		</xen:if>
+		</div>
+	</div>
+	
 	<div class="listBlock champion">
 		<xen:if is="{$game.highscore_user_id}">
 			<div class="avatarContainer">
 			<xen:avatar user="$game" size="s" img="true" />
 			</div>
 			<div class="infoContainer">
-				<xen:username user="$game" /><br />
-				{xen:phrase arcade_score}: {xen:number {$game.highscore}}<br />
+				<xen:username user="$game" rich="true" /><br />
+				<span class='muted'>{xen:phrase arcade_score}:</span> {xen:number {$game.highscore}}<br />
 				<span class="muted">{xen:date {$game.highscore_date}}</span>
 			</div>
 		<xen:else />
@@ -736,12 +765,24 @@ a.GameVoteLink.GameVoted {
 		</xen:if>
 	</div>
 
+	<div class="listBlock scores">
+		<div class="infoContainer">
+		<xen:if is="{$game.highscore_user_id}">	
+			<table align='center' class='highscores'>
+			<xen:foreach loop="$game.highscores" value="$score" i="$i">
+				<tr><td width='12'>{xen:calc '{$i}+1'}.</td><td class='name'><xen:username user="$score" rich="true" /></td><td class='datscore'>{xen:number $score.score}</span></td></tr>
+			</xen:foreach>	
+			</table>
+		</xen:if>
+		</div>
+	</div>
+	
 	<div class="listBlock personalBest">
 		<div class="infoContainer">
 		<xen:if is="{$game.played_date}">
 			<div class="titleText">
-				{xen:phrase arcade_your_score}: {xen:number {$game.played_score}}<br />
-				<xen:if is="{$game.played_rank} == 1">{xen:phrase arcade_you_are_the_champion}<xen:else />{xen:phrase arcade_your_rank}: {xen:number {$game.played_rank}}</xen:if>
+				<span class='muted'>{xen:phrase arcade_your_score}:</span> {xen:number {$game.played_score}}<br />
+				<xen:if is="{$game.played_rank} == 1"><span style='font-style:italic'>{xen:phrase arcade_you_are_the_champion}</span><xen:else /><span class='muted'>Rank:</span> {xen:number {$game.played_rank}}</xen:if>
 			</div>
 		<xen:else />
 			<div class="titleText">{xen:phrase arcade_you_have_not_played_yet}</div>
@@ -909,4 +950,5 @@ a.GameVoteLink.GameVoted {
 </form>]]></template>
   </templates>
   <bb_code_media_sites/>
+  <template_modifications/>
 </addon>

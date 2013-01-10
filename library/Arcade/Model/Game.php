@@ -230,10 +230,12 @@ class Arcade_Model_Game extends XenForo_Model {
 		$whereConditions = $this->prepareGameConditions($conditions, $fetchOptions);
 		$sqlClauses = $this->prepareGameFetchOptions($fetchOptions);
 		$limitOptions = $this->prepareLimitFetchOptions($fetchOptions);
+		$db = XenForo_Application::getDb();
 
 		$games = $this->fetchAllKeyed($this->limitQueryResults("
 				SELECT game.*
 					$sqlClauses[selectFields]
+					, (select max(last_date) from xf_arcade_game_play where game_id = game.game_id) as last_play_date
 				FROM xf_arcade_game AS game
 				$sqlClauses[joinTables]
 				WHERE $whereConditions
@@ -243,7 +245,17 @@ class Arcade_Model_Game extends XenForo_Model {
 		foreach ($games as &$game) {
 			$game['system_options'] = @unserialize($game['system_options']);
 			$game['options'] = @unserialize($game['options']);
-
+			
+			/// @todo: fold out into subquery
+			$game['highscores'] = $db->fetchAll("
+				select best_score as score, play.*, user.*
+				from xf_arcade_game_play play
+				LEFT JOIN xf_user AS user ON (user.user_id = play.user_id)
+				where game_id = ? and best_score > 0 and play.user_id <> ?
+				order by best_score desc, last_date asc 
+				limit 5
+				", array($game['game_id'], $game['highscore_user_id']));
+				
 			if (!empty($fetchOptions['image'])) {
 				if (!is_array($fetchOptions['image'])) {
 					$fetchOptions['image'] = array(trim($fetchOptions['image']));
