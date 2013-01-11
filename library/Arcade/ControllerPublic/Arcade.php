@@ -75,6 +75,7 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly 
 
 	public function actionIndex() {
 		$response = parent::actionIndex();
+		$options = XenForo_Application::get('options');	
 
 		$this->_checkView(); // Do they have permission to view/browse games?
 		$canVote = $this->_checkVote();
@@ -104,6 +105,7 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly 
 				'newGames' => $newGames,
 				'randomGames' => $randomGames,
 				'canVote' => $canVote,
+				'enableCategories' => $options->xfarcade_enable_categories,
 			);
 
 			$response = $this->responseView('Arcade_ViewPublic_Index', 'arcade_index', $viewParams);
@@ -114,7 +116,12 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly 
 
 	public function actionBrowse() {
 		$this->_checkView();
-		$categoryId = $this->_input->filterSingle('id', XenForo_Input::UINT);
+		$options = XenForo_Application::get('options');		
+		
+		$categoryId = $this->_input->filterSingle('id', XenForo_Input::UINT);			
+		if(!$options->xfarcade_enable_categories)
+			$categoryId = 0;
+		
 		$category = $this->_getCategoryOrError($categoryId);
 
 		$gameModel = $this->_getGameModel();
@@ -140,6 +147,8 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly 
 			'gameEndOffset' => ($page - 1) * $gamesPerPage + count($games) ,
 			'gamesPerPage' => $gamesPerPage,
 			'totalGames' => $totalGames,
+			
+			'enableCategories' => $options->xfarcade_enable_categories,
 		);
 		
 		return $this->responseView('Arcade_ViewPublic_Category_Browse', 'arcade_category_browse', $viewParams);

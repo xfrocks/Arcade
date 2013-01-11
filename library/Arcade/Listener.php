@@ -4,16 +4,23 @@ class Arcade_Listener {
 		$visitor = XenForo_Visitor::getInstance();
 
 		if (XenForo_Model::create('Arcade_Model_Game')->hasPermission('navbar')) {
+			
+			
+			$options = XenForo_Application::get('options');
+		
 			$tabId = 'arcade';
+			
+			/// @todo: implement arcade_links template, need way of linking directly to a category tab
+			
 			$extraTabs[$tabId] = array(
 				'href' => XenForo_Link::buildPublicLink("full:arcade"),
 				'title' => new XenForo_Phrase('arcade'),
-				'linksTemplate' => 'arcade_links',
+				//'linksTemplate' => 'arcade_links',
 				'selected' => ($seletectedTabId == $tabId),
-				'links' => array(
-					
-				),
 			);
+			
+			if(!$options->xfarcade_enable_categories)
+				unset($extraTabs[$tabId]['linksTemplate']);
 		}
 	}
 	

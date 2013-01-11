@@ -28,7 +28,7 @@ class Arcade_Model_Post extends XFCP_Arcade_Model_Post
             	if ($xfaChampion && $xfaImage){
               		$champion[$xfaImage] = $xfaImage;
             	} else {
-            		$champion[$xfaImage] = 'Current Arcade Champion of'.$userChampionPost['title'];
+            		$champion[$xfaImage] = new XenForo_Phrase('arcade_champion_of_x', array('game' => $userChampionPost['title']));
             	}
             }
         }

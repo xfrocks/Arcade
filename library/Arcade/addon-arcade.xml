@@ -297,13 +297,13 @@
       <default_value>0</default_value>
       <edit_format_params></edit_format_params>
       <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="40"/>
+      <relation group_id="xfarcade" display_order="210"/>
     </option>
     <option option_id="xfarcade_disabled_message" edit_format="textbox" data_type="string" can_backup="1">
-      <default_value>System is currently under going maintenance.</default_value>
+      <default_value>Arcade system is currently undergoing maintenance.</default_value>
       <edit_format_params>rows=3</edit_format_params>
       <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="2"/>
+      <relation group_id="xfarcade" display_order="20"/>
     </option>
     <option option_id="xfarcade_enable" edit_format="onoff" data_type="boolean" can_backup="1">
       <default_value>1</default_value>
@@ -311,36 +311,36 @@
       <sub_options></sub_options>
       <relation group_id="xfarcade" display_order="1"/>
     </option>
+    <option option_id="xfarcade_enable_categories" edit_format="onoff" data_type="boolean" can_backup="1">
+      <default_value>1</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="xfarcade" display_order="120"/>
+    </option>
     <option option_id="xfarcade_image_path" edit_format="textbox" data_type="string" can_backup="1">
       <default_value></default_value>
       <edit_format_params></edit_format_params>
       <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="42"/>
+      <relation group_id="xfarcade" display_order="220"/>
     </option>
     <option option_id="xfarcade_pc_message" edit_format="textbox" data_type="string" can_backup="1">
-      <default_value>Your score has just been beat. So go back and get that champion status back.</default_value>
+      <default_value>Your score has just been beat. So go back and try again for that champion status.</default_value>
       <edit_format_params>rows=3</edit_format_params>
       <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="51"/>
+      <relation group_id="xfarcade" display_order="320"/>
     </option>
     <option option_id="xfarcade_pc_title" edit_format="textbox" data_type="string" can_backup="1">
-      <default_value>Champion no more!!!</default_value>
+      <default_value>You've been defeated!</default_value>
       <edit_format_params></edit_format_params>
       <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="50"/>
+      <relation group_id="xfarcade" display_order="310"/>
     </option>
-    <option option_id="xfarcade_play_display" edit_format="select" data_type="integer" can_backup="1">
+    <option option_id="xfarcade_play_display" edit_format="radio" data_type="unsigned_integer" can_backup="1">
       <default_value>1</default_value>
-      <edit_format_params>1=Non-Overlay
+      <edit_format_params>1=Separate page
 2=Overlay</edit_format_params>
       <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="3"/>
-    </option>
-    <option option_id="xfarcade_text" edit_format="onoff" data_type="boolean" can_backup="1">
-      <default_value>0</default_value>
-      <edit_format_params></edit_format_params>
-      <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="41"/>
+      <relation group_id="xfarcade" display_order="110"/>
     </option>
   </optiongroups>
   <permissions>
@@ -378,6 +378,7 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_category_not_found" version_id="1" version_string="0.9"><![CDATA[The requested category could not be found.]]></phrase>
     <phrase title="arcade_category_title_must_be_unique" version_id="1" version_string="0.9"><![CDATA[Category title must be unique. A category has already existed with the specified title.]]></phrase>
     <phrase title="arcade_champion" version_id="1" version_string="0.9"><![CDATA[Champion]]></phrase>
+    <phrase title="arcade_champion_of_x" version_id="9" version_string="0.0.8.1"><![CDATA[Champion of {game}]]></phrase>
     <phrase title="arcade_change_vote" version_id="1" version_string="0.9"><![CDATA[Change Vote]]></phrase>
     <phrase title="arcade_confirm_deletion_of_category" version_id="1" version_string="0.0.1"><![CDATA[Confirm Deletion of Category]]></phrase>
     <phrase title="arcade_confirm_deletion_of_game" version_id="1" version_string="super-beta"><![CDATA[Confirm Deletion of Game]]></phrase>
@@ -453,26 +454,23 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_you_have_not_played_yet" version_id="1" version_string="0.9"><![CDATA[You haven't tried it yet]]></phrase>
     <phrase title="game_id_user_id" version_id="1" version_string="0.9"><![CDATA[Target]]></phrase>
     <phrase title="option_group_xfarcade" version_id="1" version_string="0.9"><![CDATA[XF Arcade]]></phrase>
-    <phrase title="option_group_xfarcade_description" version_id="1" version_string="0.9"><![CDATA[Settings that control the displaying of games, scores, and soon a sidebar block of newest champion.]]></phrase>
-    <phrase title="option_xfarcade_champion" version_id="10001" version_string="1.0.1"><![CDATA[Enable Champion Seal?]]></phrase>
-    <phrase title="option_xfarcade_champion_explain" version_id="10001" version_string="1.0.1"><![CDATA[Enable the champion seal to be displayed in the postbit?]]></phrase>
-    <phrase title="option_xfarcade_disabled_message" version_id="1" version_string="0.9"><![CDATA[Disabled Message]]></phrase>
-    <phrase title="option_xfarcade_disabled_message_explain" version_id="1" version_string="0.9"><![CDATA[Provide a brief message to your users of reasons the system may be down or not live at the moment.]]></phrase>
-    <phrase title="option_xfarcade_enable" version_id="1" version_string="0.9"><![CDATA[System Live?]]></phrase>
-    <phrase title="option_xfarcade_enable_explain" version_id="1" version_string="0.9"><![CDATA[Arcade system active?]]></phrase>
-    <phrase title="option_xfarcade_image_path" version_id="10001" version_string="1.0.1"><![CDATA[Champion Seal Image Path]]></phrase>
-    <phrase title="option_xfarcade_image_path_explain" version_id="10001" version_string="1.0.1"><![CDATA[Enter the champion seal image path.<br />
-<br />
-NOTE: Format - 'images/image.png' without the quotes]]></phrase>
-    <phrase title="option_xfarcade_pc_message" version_id="10001" version_string="1.0.1"><![CDATA[Personal Conversation Message]]></phrase>
-    <phrase title="option_xfarcade_pc_message_explain" version_id="10001" version_string="1.0.1"><![CDATA[Enter the message you wish to have included with the notification upon champion status being beat.<br /><br />
-NOTE: You can use BBCode]]></phrase>
-    <phrase title="option_xfarcade_pc_title" version_id="10001" version_string="1.0.1"><![CDATA[Personal Conversation Title]]></phrase>
-    <phrase title="option_xfarcade_pc_title_explain" version_id="10001" version_string="1.0.1"><![CDATA[Enter the title that will be seen when a user's score is beat and they receive a PC notification.]]></phrase>
-    <phrase title="option_xfarcade_play_display" version_id="1" version_string="0.9"><![CDATA[Game Display]]></phrase>
-    <phrase title="option_xfarcade_play_display_explain" version_id="1" version_string="0.9"><![CDATA[When playing you can have games display in an overlay form or on its own page.]]></phrase>
-    <phrase title="option_xfarcade_text" version_id="10001" version_string="1.0.1"><![CDATA[Enable Champion Text?]]></phrase>
-    <phrase title="option_xfarcade_text_explain" version_id="10001" version_string="1.0.1"><![CDATA[Enable the champion text? Champion seal must be enabled for this to work and you can not have Image Path filled out otherwise this will break.]]></phrase>
+    <phrase title="option_group_xfarcade_description" version_id="9" version_string="0.0.8.1"><![CDATA[Powerful multi-format arcade system by the XF Arcade team.]]></phrase>
+    <phrase title="option_xfarcade_champion" version_id="9" version_string="0.0.8.1"><![CDATA[Enable champion seal]]></phrase>
+    <phrase title="option_xfarcade_champion_explain" version_id="9" version_string="0.0.8.1"><![CDATA[Displays a champion seal in forum posts.]]></phrase>
+    <phrase title="option_xfarcade_disabled_message" version_id="9" version_string="0.0.8.1"><![CDATA[Disabled message]]></phrase>
+    <phrase title="option_xfarcade_disabled_message_explain" version_id="9" version_string="0.0.8.1"><![CDATA[This message will be displayed when the arcade is disabled.]]></phrase>
+    <phrase title="option_xfarcade_enable" version_id="9" version_string="0.0.8.1"><![CDATA[Arcade enabled]]></phrase>
+    <phrase title="option_xfarcade_enable_categories" version_id="9" version_string="0.0.8.1"><![CDATA[Enable categories]]></phrase>
+    <phrase title="option_xfarcade_enable_categories_explain" version_id="9" version_string="0.0.8.1"><![CDATA[Disable this option to hide the game categories system from users - best used for small arcades.]]></phrase>
+    <phrase title="option_xfarcade_enable_explain" version_id="9" version_string="0.0.8.1"><![CDATA[]]></phrase>
+    <phrase title="option_xfarcade_image_path" version_id="9" version_string="0.0.8.1"><![CDATA[Champion seal image]]></phrase>
+    <phrase title="option_xfarcade_image_path_explain" version_id="9" version_string="0.0.8.1"><![CDATA[Enter the path relative to your forum root of an image to use for champion seals. If this is left blank, the phrase arcade_champion_of_x will be used instead.]]></phrase>
+    <phrase title="option_xfarcade_pc_message" version_id="9" version_string="0.0.8.1"><![CDATA[Defeated conversation message]]></phrase>
+    <phrase title="option_xfarcade_pc_message_explain" version_id="9" version_string="0.0.8.1"><![CDATA[Enter the message for the PM that will be sent to the previous champion when their highscore is beaten. BBCode is supported.]]></phrase>
+    <phrase title="option_xfarcade_pc_title" version_id="9" version_string="0.0.8.1"><![CDATA[Defeated conversation title]]></phrase>
+    <phrase title="option_xfarcade_pc_title_explain" version_id="9" version_string="0.0.8.1"><![CDATA[Enter the title for the PM that will be sent to the previous champion when their highscore is beaten.]]></phrase>
+    <phrase title="option_xfarcade_play_display" version_id="9" version_string="0.0.8.1"><![CDATA[Game display mode]]></phrase>
+    <phrase title="option_xfarcade_play_display_explain" version_id="9" version_string="0.0.8.1"><![CDATA[Select the way in which active games should be displayed.]]></phrase>
     <phrase title="permission_group_xfarcade" version_id="1" version_string="0.9"><![CDATA[XF Arcade]]></phrase>
     <phrase title="permission_interface_xfarcade" version_id="1" version_string="0.9"><![CDATA[XF Arcade]]></phrase>
     <phrase title="permission_xfarcade_xfarcade_can_comment" version_id="1" version_string="0.9"><![CDATA[Can comment on games]]></phrase>
@@ -540,8 +538,8 @@ NOTE: You can use BBCode]]></phrase>
 	color: {xen:property secondaryDarker};
 	background: {xen:property secondaryLighter} url('{xen:property imagePath}/xenforo/gradients/category-23px-light.png') repeat-x top;
 	padding: 5px 10px;
-	margin: 3px auto 0;
-	border-top: 1px solid {xen:property secondaryLighter};
+	margin: 1px auto 0;
+	/*border-top: 1px solid {xen:property secondaryLighter};*/
 	border-bottom: 1px solid {xen:property secondaryLight};
 	
 	padding: 0;
@@ -604,7 +602,8 @@ NOTE: You can use BBCode]]></phrase>
 		
 		.gameListItem .secondRow {
 			font-size: 11px;
-			clear: both;
+			/*clear: both;*/
+			margin-top: 5px;
 		}
 			
 			.gameListItem .secondRow .controls {
@@ -635,7 +634,7 @@ NOTE: You can use BBCode]]></phrase>
 
 #arcadeHome .tabs li a {
 	font-size: 20px;
-	color: {xen:property primaryLightish};
+	color: {xen:property primaryDarker};
 	padding: 5px 10px;
 }
 	
@@ -659,7 +658,7 @@ a.GameVoteLink.GameVoted {
 .highscores .datscore { text-align: left; }
 .gameListItem .secondRow { color: #999; }
 
-]]></template>
+.gameList .theTitle { padding-left: 5px; }]]></template>
     <template title="arcade_category_browse" version_id="1" version_string="0.9"><![CDATA[<xen:title>{xen:phrase arcade_category} {$category.title}</xen:title>
 <xen:h1>{$category.title}</xen:h1>
 
@@ -709,7 +708,7 @@ a.GameVoteLink.GameVoted {
 <xen:if is="{$category} AND {$totalGames}">
 	<xen:pagenav link="arcade/browse" linkdata="{$category}" page="{$page}" perpage="{$gamesPerPage}" total="{$totalGames}" />
 </xen:if>]]></template>
-    <template title="arcade_game_list_item" version_id="7" version_string="0.0.7"><![CDATA[<xen:require css="arcade.css" />
+    <template title="arcade_game_list_item" version_id="9" version_string="0.0.8.1"><![CDATA[<xen:require css="arcade.css" />
 
 <li class="gameListItem">
 	<div class="listBlock image">
@@ -731,7 +730,11 @@ a.GameVoteLink.GameVoted {
 			<div class="secondRow">
 				{$game.description}
 				<div class="controls faint">
-					<a href="{xen:link 'full:arcade/browse', {xen:array 'category_id={$game.category_id}', 'title={$game.category_title}'}}" class="EditControl">{$game.category_title}</a>
+				
+					<xen:if is="{$enableCategories}">
+						<a href="{xen:link 'full:arcade/browse', {xen:array 'category_id={$game.category_id}', 'title={$game.category_title}'}}" class="EditControl">{$game.category_title}</a>
+					</xen:if>
+					
 					<xen:if is="{$canVote}">
 						/
 						<xen:include template="arcade_game_vote" />
@@ -803,14 +806,14 @@ a.GameVoteLink.GameVoted {
 {xen:phrase arcade_not_recommend}
 </a>
 </span>]]></template>
-    <template title="arcade_index" version_id="7" version_string="0.0.7"><![CDATA[<xen:require css="arcade.css" />
+    <template title="arcade_index" version_id="9" version_string="0.0.8.1"><![CDATA[<xen:require css="arcade.css" />
 
 <xen:title>{xen:phrase arcade}</xen:title>
 <xen:h1>{xen:phrase arcade}</xen:h1>
 
 <div id="arcadeHome" class="sectionMain">
 <xen:if is="{$xenOptions.xfarcade_enable}">
-	<ul class="tabs Tabs" data-panes="#GameCategories > li" data-history="on">
+	<ul class="tabs Tabs" data-panes="#GameCategories > li" data-history="on" style="{xen:if $enableCategories, '', 'display:none'}">
 		<li><a href="{$requestPaths.requestUri}#all">{xen:phrase arcade_all}</a></li>
 		<li><a href="{$requestPaths.requestUri}#new">{xen:phrase arcade_new}</a></li>
 		<li><a href="{$requestPaths.requestUri}#random">{xen:phrase arcade_random}</a></li>
