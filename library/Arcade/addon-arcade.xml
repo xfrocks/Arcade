@@ -378,7 +378,7 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_category_not_found" version_id="1" version_string="0.9"><![CDATA[The requested category could not be found.]]></phrase>
     <phrase title="arcade_category_title_must_be_unique" version_id="1" version_string="0.9"><![CDATA[Category title must be unique. A category has already existed with the specified title.]]></phrase>
     <phrase title="arcade_champion" version_id="1" version_string="0.9"><![CDATA[Champion]]></phrase>
-    <phrase title="arcade_champion_of_x" version_id="9" version_string="0.0.8.1"><![CDATA[Champion of {game}]]></phrase>
+    <phrase title="arcade_champion_of_x" global_cache="1" version_id="9" version_string="0.0.8.1"><![CDATA[Champion of {game}]]></phrase>
     <phrase title="arcade_change_vote" version_id="1" version_string="0.9"><![CDATA[Change Vote]]></phrase>
     <phrase title="arcade_confirm_deletion_of_category" version_id="1" version_string="0.0.1"><![CDATA[Confirm Deletion of Category]]></phrase>
     <phrase title="arcade_confirm_deletion_of_game" version_id="1" version_string="super-beta"><![CDATA[Confirm Deletion of Game]]></phrase>
@@ -407,12 +407,14 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_instruction" version_id="1" version_string="0.9"><![CDATA[Instruction]]></phrase>
     <phrase title="arcade_instruction_explain" version_id="1" version_string="0.0.1"><![CDATA[Enter the instructions on how to play the game.  ]]></phrase>
     <phrase title="arcade_invalid_category" version_id="1" version_string="0.9"><![CDATA[Invalid category specified.]]></phrase>
+    <phrase title="arcade_last_played" version_id="9" version_string="0.0.8.1"><![CDATA[Last played]]></phrase>
     <phrase title="arcade_new" version_id="1" version_string="0.9"><![CDATA[New]]></phrase>
     <phrase title="arcade_not_recommend" version_id="1" version_string="0.9"><![CDATA[Not Recommend]]></phrase>
     <phrase title="arcade_no_champion_yet" version_id="1" version_string="0.9"><![CDATA[No one's played this yet]]></phrase>
     <phrase title="arcade_no_game_to_display" version_id="1" version_string="0.9"><![CDATA[There is no game to display.]]></phrase>
     <phrase title="arcade_personal_best" version_id="1" version_string="0.9"><![CDATA[Personal Best]]></phrase>
     <phrase title="arcade_play" version_id="5" version_string="0.0.5"><![CDATA[Play]]></phrase>
+    <phrase title="arcade_played_x_time_s" version_id="4" version_string="0.1.0"><![CDATA[<span class='muted'>Played </span>{times} <span class='muted'>time{plural}</span>]]></phrase>
     <phrase title="arcade_play_game" version_id="5" version_string="0.0.5"><![CDATA[Play Game]]></phrase>
     <phrase title="arcade_please_confirm_that_you_want_to_delete_following_category" version_id="1" version_string="0.0.1"><![CDATA[Please confirm that you want to delete the following category:]]></phrase>
     <phrase title="arcade_please_confirm_that_you_want_to_delete_following_game" version_id="1" version_string="0.0.1"><![CDATA[Please confirm that you want to delete the following game:]]></phrase>
@@ -747,8 +749,9 @@ a.GameVoteLink.GameVoted {
 	<div class="listBlock gameStats" style='font-size: 11px'>
 		<div class="infoContainer">
 		<xen:if is="{$game.last_play_date}">
-			<span class='muted'>Played </span>{xen:number $game.play_count}<span class='muted'> time<xen:if is="{$game.play_count} != 1">s</xen:if></span><br />
-			<span class='muted'>Last played: </span>{xen:date {$game.highscore_date}}
+			{xen:phrase 'arcade_played_x_time_s', 'times={xen:number $game.play_count}', 'plural={xen:if "{$game.play_count} != 1", "s"}'}
+			<br />
+			<span class='muted'>{xen:phrase 'arcade_last_played'}: </span>{xen:date {$game.highscore_date}}
 		</xen:if>
 		</div>
 	</div>
