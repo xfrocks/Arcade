@@ -200,6 +200,10 @@ class Arcade_Model_Game extends XenForo_Model {
 		return compact('scoreFunction', 'scoreDirection', 'scoreOperator', 'scoreOperatorAlt');
 	}
 	
+	public function deleteGamePlayByGameId($gameId) {
+		$this->_getDb()->query('DELETE FROM `xf_arcade_game_play` WHERE game_id = ?', array($gameId));
+	}
+	
 	public static function getImageFilePath(array $game, $size = 'l') {
 		$gameId = $game['game_id'];
 		$group = floor($gameId / 100);

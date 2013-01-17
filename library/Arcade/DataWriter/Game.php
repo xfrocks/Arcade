@@ -199,6 +199,9 @@ class Arcade_DataWriter_Game extends XenForo_DataWriter {
 			@unlink($filePath);
 		}
 		
+		$this->_getGameModel()->deleteGamePlayByGameId($existingData['game_id']);
+		$this->_getSessionModel()->deleteSessionByGameId($existingData['game_id']);
+		
 		$system = $this->_getSystemModel()->initSystem($this->get('system_id'));
 		$system->doPostDelete($this);
 	}
@@ -271,5 +274,9 @@ class Arcade_DataWriter_Game extends XenForo_DataWriter {
 	
 	protected function _getCategoryModel() {
 		return $this->getModelFromCache('Arcade_Model_Category');
+	}
+	
+	protected function _getSessionModel() {
+		return $this->getModelFromCache('Arcade_Model_Session');
 	}
 }

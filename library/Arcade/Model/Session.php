@@ -92,5 +92,7 @@ class Arcade_Model_Session extends XenForo_Model {
 		return Arcade_Model_Game::getScoreComparison($reversedScoring);
 	}
 	
-
+	public function deleteSessionByGameId($gameId) {
+		$this->_getDb()->query('DELETE FROM `xf_arcade_session` WHERE game_id = ?', array($gameId));
+	}
 }
