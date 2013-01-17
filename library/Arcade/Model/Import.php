@@ -147,7 +147,10 @@ class Arcade_Model_Import extends XenForo_Model {
 	}
 	
 	protected function _detectSystemId($dir, array &$gameInfo) {
-		$systemId = false;
+		$mochiMetadataFilePath = Arcade_Helper_File::buildPath($dir, '__metadata__.json');
+		if (file_exists($mochiMetadataFilePath)) {
+			return 'mochi';
+		}
 		
 		$childDirs = Arcade_Helper_File::getContentsInside($dir, Arcade_Helper_File::FLAG_DIRECTORY);
 		foreach ($childDirs as $childDir) {
@@ -156,25 +159,22 @@ class Arcade_Model_Import extends XenForo_Model {
 			if ($childDirName === 'gamedata') {
 				// game package contains gamedata directory?
 				// this must be IPB game
-				$systemId = 'ipb';
+				return 'ipb';
 			}
 		}
 		
-		if (empty($systemId) AND !empty($gameInfo['slug'])) {
+		if (!empty($gameInfo['slug'])) {
 			// it looks like all core game package contains an install file in the format
 			// '{$slug}.game.php', feel free to remove this detecting routine if it gives
 			// true negative results
-			$installFileName = $gameInfo['slug'] . '.game.php';
-			$files = Arcade_Helper_File::getContentsInside($dir, Arcade_Helper_File::FLAG_FILE);
-			foreach ($files as $file) {
-				if (basename($file) === $installFileName) {
-					$systemId = 'core';
-				}
+			$installFilePath = Arcade_Helper_File::buildPath($dir, $gameInfo['slug'] . '.game.php');
+			if (file_exists($installFilePath)) {
+				return 'core';
 			}
 		}
 		
 		// add-on that extends this method may want to catch return value === false
 		// to check for other game systems
-		return $systemId;
+		return false;
 	}
 }
