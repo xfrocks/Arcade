@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="arcade" title="XF Arcade" version_string="0.0.8.3" version_id="12" url="http://xfarcade.com" install_callback_class="Arcade_Installer" install_callback_method="install" uninstall_callback_class="Arcade_Installer" uninstall_callback_method="uninstall">
+<addon addon_id="arcade" title="XF Arcade" version_string="0.0.8.4" version_id="13" url="http://xfarcade.com" install_callback_class="Arcade_Installer" install_callback_method="install" uninstall_callback_class="Arcade_Installer" uninstall_callback_method="uninstall">
   <admin_navigation>
     <navigation navigation_id="arcade" parent_navigation_id="" display_order="21" link="arcade" admin_permission_id="arcade" debug_only="0" hide_no_children="1"/>
     <navigation navigation_id="arcade_categories" parent_navigation_id="arcade" display_order="2" link="arcade/categories" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
@@ -303,6 +303,9 @@
 	<div id="fileHtml">{$additionalFiles}</div>
 </xen:uploadunit>
 ]]></template>
+    <template title="arcade_system_mochi_options"><![CDATA[<xen:uploadunit label="{xen:phrase arcade_system_option_target}" name="target" value="" explain="{xen:phrase arcade_system_option_target_explain}">
+	<div id="targetHtml">{xen:if "{$targetFound}", {xen:phrase arcade_target_found, "target={$targetPath}"}}</div>
+</xen:uploadunit>]]></template>
   </admin_templates>
   <code_events/>
   <code_event_listeners>
@@ -351,6 +354,18 @@
       <edit_format_params></edit_format_params>
       <sub_options></sub_options>
       <relation group_id="xfarcade" display_order="220"/>
+    </option>
+    <option option_id="xfarcade_mochimedia_id" edit_format="textbox" data_type="string" can_backup="1">
+      <default_value></default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="xfarcade" display_order="50"/>
+    </option>
+    <option option_id="xfarcade_mochimedia_key" edit_format="textbox" data_type="string" can_backup="1">
+      <default_value></default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="xfarcade" display_order="51"/>
     </option>
     <option option_id="xfarcade_pc_message" edit_format="textbox" data_type="string" can_backup="1">
       <default_value>Your score has just been beat. So go back and try again for that champion status.</default_value>
@@ -448,6 +463,7 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_play_game" version_id="5" version_string="0.0.5"><![CDATA[Play Game]]></phrase>
     <phrase title="arcade_please_confirm_that_you_want_to_delete_following_category" version_id="1" version_string="0.0.1"><![CDATA[Please confirm that you want to delete the following category:]]></phrase>
     <phrase title="arcade_please_confirm_that_you_want_to_delete_following_game" version_id="1" version_string="0.0.1"><![CDATA[Please confirm that you want to delete the following game:]]></phrase>
+    <phrase title="arcade_please_login_to_submit_score" version_id="12" version_string="0.0.8.3"><![CDATA[Please login to submit score.]]></phrase>
     <phrase title="arcade_please_select_your_vote" version_id="1" version_string="0.9"><![CDATA[Please select your vote]]></phrase>
     <phrase title="arcade_please_upload_valid_game_package" version_id="8" version_string="0.0.8"><![CDATA[Please upload a valid game package file. The file should have the extension of "zip" or "tar".]]></phrase>
     <phrase title="arcade_random" version_id="1" version_string="0.9"><![CDATA[Random]]></phrase>
@@ -499,6 +515,10 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="option_xfarcade_enable_explain" version_id="9" version_string="0.0.8.1"><![CDATA[]]></phrase>
     <phrase title="option_xfarcade_image_path" version_id="9" version_string="0.0.8.1"><![CDATA[Champion seal image]]></phrase>
     <phrase title="option_xfarcade_image_path_explain" version_id="9" version_string="0.0.8.1"><![CDATA[Enter the path relative to your forum root of an image to use for champion seals. If this is left blank, the phrase arcade_champion_of_x will be used instead.]]></phrase>
+    <phrase title="option_xfarcade_mochimedia_id" version_id="12" version_string="0.0.8.3"><![CDATA[Mochi Publisher ID]]></phrase>
+    <phrase title="option_xfarcade_mochimedia_id_explain" version_id="12" version_string="0.0.8.3"><![CDATA[Your registered and verified publisher ID for <a href="https://www.mochimedia.com/" target="_blank" tabindex="-1">MochiMedia</a>.]]></phrase>
+    <phrase title="option_xfarcade_mochimedia_key" version_id="12" version_string="0.0.8.3"><![CDATA[Mochi Secret Key]]></phrase>
+    <phrase title="option_xfarcade_mochimedia_key_explain" version_id="12" version_string="0.0.8.3"><![CDATA[]]></phrase>
     <phrase title="option_xfarcade_pc_message" version_id="9" version_string="0.0.8.1"><![CDATA[Defeated conversation message]]></phrase>
     <phrase title="option_xfarcade_pc_message_explain" version_id="9" version_string="0.0.8.1"><![CDATA[Enter the message for the PM that will be sent to the previous champion when their highscore is beaten. BBCode is supported.]]></phrase>
     <phrase title="option_xfarcade_pc_title" version_id="9" version_string="0.0.8.1"><![CDATA[Defeated conversation title]]></phrase>
@@ -942,6 +962,49 @@ a.GameVoteLink.GameVoted {
 		pluginspage="http://www.macromedia.com/go/getflashplayer"
 		type="application/x-shockwave-flash"></embed>
 </object>]]></template>
+    <template title="arcade_player_mochi" version_id="12" version_string="0.0.8.3"><![CDATA[<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+	codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,14,0"
+	width="{$game.system_options.width}"
+	height="{$game.system_options.height}"
+	id="game_object">
+	<param name="movie" value="{$targetUrl}" />
+	<param name="quality" value="high" />
+	<embed src="{$targetUrl}"
+		width="{$game.system_options.width}"
+		height="{$game.system_options.height}"
+		id="game_embedobj"
+		quality="high"
+		pluginspage="http://www.macromedia.com/go/getflashplayer"
+		type="application/x-shockwave-flash"></embed>
+</object>
+
+<div id="leaderboard_bridge"></div>
+<script src="http://xs.mochiads.com/static/pub/swf/leaderboard.js" type="text/javascript"></script>
+<script type="text/javascript">
+	// Mochi Bridge
+	var options = {
+		partnerID: "{xen:jsescape {xen:helper Arcade_getOption, mochimedia_id}}",
+		id: "leaderboard_bridge"
+	};
+	options.gateway = "{xen:jsescape {xen:link 'canonical:arcade/mochi-gateway'}}";
+	options.siteURL = "{xen:jsescape {xen:link 'canonical:index'}}";
+	options.siteName = "{xen:jsescape $xenOptions.boardTitle}";
+	options.sessionID = "{xen:jsescape {xen:raw $game.slug}}";
+
+	<xen:if is="{$visitor.user_id} > 0">
+	options.userID = "{xen:jsescape $visitor.user_id}";
+	options.username = "{xen:jsescape $visitor.username}";
+	options.profileURL = "{xen:jsescape {xen:link 'canonical:members', $visitor}}";
+	<xen:else />
+	options.denyScores = "{xen:jsescape {xen:phrase arcade_please_login_to_submit_score}}";
+	</xen:if>
+	
+	<xen:if is="{$debugMode}">
+	options.debug = "true";
+	</xen:if>
+
+	Mochi.addLeaderboardIntegration(options);
+</script>]]></template>
     <template title="arcade_post_champion_seal" version_id="2" version_string="0.0.2"><![CDATA[<xen:if is="{$post.champion}">
 <dl class="pairsInline"><dt>:){xen:raw $post.champion}</dt></dl>
 </xen:if>]]></template>

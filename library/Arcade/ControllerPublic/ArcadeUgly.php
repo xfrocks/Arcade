@@ -91,23 +91,15 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 		$input = $this->_input->filter(array(
 			'id' => XenForo_Input::UINT,
 			'microone' => XenForo_Input::FLOAT,
-			'mochigame' => XenForo_Input::UINT,
 		));
 
 		$gameModel = $this->_getGameModel();
 		$sessionModel = $this->_getSessionModel();
 		$visitor = XenForo_Visitor::getInstance();
 
-		if ($input['mochigame']) {
-			$conditions = array('game_id' => $input['mochigame'], 'session_user_id' => $visitor->get('user_id'));
-			$fetchOptions = array('order' => 'session_id', 'direction' => 'desc');
-		} else {
-			$conditions = array('session_id' => $input['id']);
-			$fetchOptions = array();
-		}
-
+		$conditions = array('session_id' => $input['id']);
+		$fetchOptions = array();
 		$game = $gameModel->getGame($conditions, $fetchOptions);
-		$input['id'] = $game['session_id']; // fix for mochigame
 
 		$this->_assertGamePermission('play', $game);
 
@@ -115,7 +107,7 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 			return $this->responseNoPermission();
 		}
 
-		$ping = sprintf('%.1f', ($this->_getMicrotime(true) - ($input['mochigame'] ? XenForo_Application::$time : $input['microone'])) / 2 * 1000);
+		$ping = sprintf('%.1f', ($this->_getMicrotime(true) - $input['microone']) / 2 * 1000);
 
 		if ($ping > 4500 AND Arcade_Option::get('doFraudCheck')) {
 			$valid = 0;
@@ -249,10 +241,69 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 			))
 		);
 	}
+	
+	public function actionMochiGateway() {
+		$params = $this->_input->filter(array(
+			'signature' => XenForo_Input::STRING,
+			'userID' => XenForo_Input::UINT,
+			'sessionID' => XenForo_Input::STRING,
+			'submission' => XenForo_Input::STRING,	
+			'score' => XenForo_Input::UINT,
+		));
+
+		if ($params['submission'] != 'score') {
+			return $this->responseNoPermission();
+		}
+		
+		if ($params['userID'] != XenForo_Visitor::getUserId()) {
+			return $this->responseNoPermission();
+		}
+		
+		$validation = array();
+		$postKeys = array_keys($_POST);
+		asort($postKeys);
+		foreach ($postKeys as $postKey) {
+			if ($postKey != 'signature') {
+				$validation[] = sprintf('%s=%s', $postKey, rawurldecode($_POST[$postKey]));
+			}
+		}
+		$validationStr = implode('&', $validation);
+		$validationStr .= Arcade_Option::get('mochimedia_key');
+		$validationMd5 = md5($validationStr);
+		if ($validationMd5 !== $params['signature']) {
+			return $this->responseNoPermission();
+		}
+		
+		// note: sessionId is actually the game slug
+		$game = $this->_getGameOrError($params['sessionID']);
+
+		$sessionId = $this->_getSessionModel()->saveSession($game, XenForo_Visitor::getInstance()->toArray(), array(
+			'time_start' => XenForo_Application::$time,
+			'time_finish' => XenForo_Application::$time,
+			'type' => 1,
+			'challenge_id' => 0,
+			'score' => $params['score'],
+		));
+
+		// TODO: skip redirecting to session burn maybe?
+		// I don't really know why we have to do this...
+		return $this->responseRedirect(
+			XenForo_ControllerResponse_Redirect::SUCCESS,
+			XenForo_Link::buildPublicLink('arcade', array(), array(
+				'sessdo' => 'burn',
+				'id' => $sessionId,
+				'microone' => $this->_getMicrotime(true),
+			))
+		);
+	}
 
 	protected function _checkCsrf($action) {
-		if ('Index' == $action) {
+		if (strtolower($action) === 'index') {
 			/* bypass CSRF check for entry point */
+			self::$_executed['csrf'] = true;
+			return true;
+		} elseif (strtolower($action) == 'mochigateway') {
+			// bypass CSRF check for mochi callback
 			self::$_executed['csrf'] = true;
 			return true;
 		} else {

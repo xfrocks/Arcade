@@ -31,6 +31,7 @@ class Arcade_Listener {
 	}
 	
 	public static function init_dependencies(XenForo_Dependencies_Abstract $dependencies, array $data) {
+		XenForo_Template_Helper_Core::$helperCallbacks['arcade_getoption'] = array('Arcade_Option', 'get');
 		XenForo_Template_Helper_Core::$helperCallbacks['arcade_base64_encode'] = 'base64_encode';
 	}
 	

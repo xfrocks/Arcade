@@ -6,6 +6,6 @@ class Arcade_Option {
 			case 'gamesPerPage': return 25;
 		}
 		
-		return XenForo_Application::get('options')->get('arcade_' . $key);
+		return XenForo_Application::get('options')->get('xfarcade_' . $key);
 	}
 }
