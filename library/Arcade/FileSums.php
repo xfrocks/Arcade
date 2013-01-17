@@ -6,7 +6,7 @@ class Arcade_FileSums
 	{
 		return array (
   'library/Arcade/ControllerAdmin/Arcade.php' => '5e01d4f042f1ae6aa496777e2e949259',
-  'library/Arcade/ControllerPublic/Arcade.php' => 'a455e120b7ca8718880910351049484a',
+  'library/Arcade/ControllerPublic/Arcade.php' => '79756d4ed5a50ce5437b1d2d9f34d36c',
   'library/Arcade/ControllerPublic/ArcadeUgly.php' => 'f5bff0d2502ec8435a1bb0f491f39792',
   'library/Arcade/DataWriter/Category.php' => '122c4a661b066fa34b08dbe5b3dc9b2f',
   'library/Arcade/DataWriter/Game.php' => '4124ea4b0001a99f42103a0c14c3bbe9',
@@ -14,11 +14,11 @@ class Arcade_FileSums
   'library/Arcade/Helper/File.php' => '0302abf2f0deaa6adee3f82a4cd89953',
   'library/Arcade/Helper/PhpParser.php' => '042669ca479eb510f6f8d15ce7b73b92',
   'library/Arcade/Installer.php' => '0f98c17a349b03009f516f313f3bb821',
-  'library/Arcade/Listener.php' => '4c0c69fd26f23d1490ca603d97b88ac4',
+  'library/Arcade/Listener.php' => '98de3256031ac6d2760d685aa50b6376',
   'library/Arcade/Model/Category.php' => '582d0f79bce4da1aab4d6e7496b897f8',
-  'library/Arcade/Model/Game.php' => '03efcbe9b52af887e5b63bf63ef83b55',
+  'library/Arcade/Model/Game.php' => '057fef947948e6cfd133e41017425108',
   'library/Arcade/Model/Import.php' => 'bc15bc856bb43e306834243a4c9e23b6',
-  'library/Arcade/Model/Post.php' => '1a1df20af120819a73d0d2435bbee7a8',
+  'library/Arcade/Model/Post.php' => 'cf0ee28e47846cd133495fb591e6851b',
   'library/Arcade/Model/Session.php' => '7738252cf014866ebe1bbb3e950e09ff',
   'library/Arcade/Model/System.php' => '1f6505ca0ec7c62ca0979b3b46483600',
   'library/Arcade/Model/Vote.php' => '284881a02003c08fa3917c98233cc51a',
