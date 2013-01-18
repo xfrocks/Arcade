@@ -62,6 +62,27 @@ class Arcade_Model_Import extends XenForo_Model {
 		
 		return $tempOutputDir;
 	}
+
+	public function extractFromUrl($url) {
+		$tempDir = XenForo_Helper_File::getTempDir();
+		$tempFile = tempnam($tempDir, 'xfa');
+
+		// TODO: use something more robust like curl?
+		// file_put_contents/file_get_contents are known to fail if the
+		// file is too big
+		$contents = @file_get_contents($url);
+		if (empty($contents)) return false;
+		@file_put_contents($tempFile, $contents);
+
+		$upload = new XenForo_Upload(basename($url), $tempFile);
+		$result = $this->extract($upload);
+
+		// delete the temp file after extracting it
+		// we do not care about successful extract or not at this point
+		Arcade_Helper_File::cleanUp($tempFile);
+
+		return $result;
+	}
 	
 	public function findPackages($dir) {
 		$packages = array();

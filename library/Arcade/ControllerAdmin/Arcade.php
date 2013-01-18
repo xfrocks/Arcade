@@ -414,6 +414,100 @@ class Arcade_ControllerAdmin_Arcade extends XenForo_ControllerAdmin_Abstract {
 			return $this->responseView('Arcade_ViewAdmin_Import_Step1', 'arcade_import_step1', $viewParams);
 		}
 	}
+
+	public function actionImportMochi() {
+		$params = $this->_input->filter(array(
+			'q' => XenForo_Input::STRING,
+			'category' => XenForo_Input::STRING,
+			'rating' => XenForo_Input::STRING,
+			'quality' => XenForo_Input::STRING,
+			'leaderboard' => XenForo_Input::UINT,
+			'no_chinese' => XenForo_Input::UINT,
+		));
+
+		$page = $this->_input->filterSingle('page', XenForo_Input::UINT);
+
+		$queue = $this->_input->filterSingle('queue', XenForo_Input::ARRAY_SIMPLE);
+		foreach ($queue as $queuedZip => $queuedName) {
+			$params[sprintf('queue[%s]', $queuedZip)] = $queuedName;
+		}
+
+		$import = $this->_input->filterSingle('import', XenForo_Input::STRING);
+		if (!empty($import)) {
+			// user clicked import, start downloading files and importing...
+			$importModel = $this->getModelFromCache('Arcade_Model_Import');
+			$gamesToBeImported = array();
+
+			if (empty($queue)) {
+				return $this->responseError(new XenForo_Phrase('arcade_import_mochi_games_please_queue_to_import'));
+			}
+
+			foreach ($queue as $queuedZip => $queuedName) {
+				$extracted = $importModel->extractFromUrl($queuedZip);
+				$gamesToBeImported[$extracted] = array('active' => 1);
+			}
+
+			$this->_request->setParam('_sessionData', base64_encode(json_encode($gamesToBeImported)));
+			return $this->responseReroute('Arcade_ControllerAdmin_Arcade', 'Import');
+		}
+
+		if (!$this->_request->isPost() AND count($_GET) == 1) {
+			// this is the first page request
+			// set some sane default filter parameters
+			$params['quality'] = '>=3';
+			$params['leaderboard'] = 1;
+			$params['no_chinese'] = 1;
+		}
+
+		$queries = array();
+		$mochiCategories = Arcade_System_Mochi::getCategories();
+		$mochiRatings = Arcade_System_Mochi::getRatings();
+
+		if (!empty($params['q'])) {
+			$queries[] = sprintf('search:%s', $params['q']);
+		}
+
+		if (!empty($params['category'])) {
+			if (isset($mochiCategories[$params['category']])) {
+				$queries[] = sprintf('category:%s', $params['category']);
+			}
+		}
+
+		if (!empty($params['rating'])) {
+			if (isset($mochiRatings[$params['rating']])) {
+				$queries[] = sprintf('rating:%s', $params['rating']);
+			}
+		}
+
+		if (in_array($params['quality'], array(
+			'>=3',
+			'>=4',
+		))) {
+			$queries[] = sprintf('recommendation:%s', $params['quality']);
+		}
+
+		if (!empty($params['leaderboard'])) {
+			$queries[] = 'leaderboard_enabled';
+		}
+
+		if (!empty($params['no_chinese'])) {
+			$queries[] = 'not tags:zh-cn';
+		}
+
+		$feed = Arcade_System_Mochi::getFeed($queries, $page, 24);
+
+		$viewParams = array(
+			'queue' => $queue,
+
+			'params' => $params,
+			'feed' => $feed,
+
+			'categories' => $mochiCategories,
+			'ratings' => $mochiRatings,
+		);
+
+		return $this->responseView('Arcade_ViewAdmin_Import_Mochi', 'arcade_import_mochi', $viewParams);
+	}
 	
 	protected function _getGameOrError($gameId, array $fetchOptions = array()) {
 		$info = $this->_getGameModel()->getGameById($gameId, $fetchOptions);

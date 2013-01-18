@@ -3,6 +3,8 @@
 class Arcade_System_Mochi extends Arcade_System_Abstract {
 	protected $_customizedOptionsTemplate = 'arcade_system_mochi_options';
 	protected $_playerTemplate = 'arcade_player_mochi';
+
+	const DATA_REGISTRY_ITEM_NAME = 'arcade_mochi_feed_cache';
 	
 	public function detectGameOptions($dir, array &$gameInfo) {
 		if (!isset($gameInfo['system_options'])) {
@@ -126,4 +128,78 @@ class Arcade_System_Mochi extends Arcade_System_Abstract {
 			Arcade_Helper_File::moveFile($swfPath, $target);
 		}
 	}
+
+	public static function getCategories() {
+		return array(
+			'action' => 'Action',
+			'adventure' => 'Adventure',
+			'board-game' => 'Board Game',
+			'casino' => 'Casino',
+			'driving' => 'Driving',
+			'dress-up' => 'Dress Up',
+			'fighting' => 'Fighting',
+			'puzzles' => 'Puzzles',
+			'customize' => 'Pimp my / Customize',
+			'shooting' => 'Shooting',
+			'sports' => 'Sports',
+			'other' => 'Other',
+			'strategy' => 'Strategy',
+			'education' => 'Education',
+			'rhythm' => 'Rhythm',
+			'jigsaw' => 'Jigsaw / Slider Puzzles',
+		);
+	}
+
+	public static function getRatings() {
+		return array(
+			'everyone' => 'Everyone',
+			'teen' => 'Teen',
+			'mature' => 'Mature',
+		);
+	}
+
+	public static function getFeed(array $queries, $page=1, $limit=25) {
+		$id = Arcade_Option::get('mochimedia_id');
+		$q = implode(' and ', $queries);
+		$page = max(1, $page);
+		$limit = max(10, $limit);
+		$dataRegistryModel = self::_getModelFromCache('XenForo_Model_DataRegistry');
+
+		$feedUrl = sprintf('%s?partner_id=%s&q=%s&limit=%d&offset=%d',
+			'http://feedmonger.mochimedia.com/feeds/query/',
+			$id,
+			urlencode($q),
+			$limit,
+			($page - 1) * $limit
+		);
+		
+		$cached = $dataRegistryModel->get(self::DATA_REGISTRY_ITEM_NAME);
+		if (!empty($cached[$feedUrl])) {
+			$feedContents = $cached[$feedUrl];
+		} else {
+			$feedContents = @file_get_contents($feedUrl);
+			$cached[$feedUrl] = $feedContents;
+			$dataRegistryModel->set(self::DATA_REGISTRY_ITEM_NAME, $cached);
+		}
+
+		$json = @json_decode($feedContents, true);
+
+		if (!empty($json)) {
+			if (isset($json['total']) AND isset($json['games'])) {
+				return array(
+					'games' => $json['games'],
+					'total' => $json['total'],
+
+					'feedUrl' => $feedUrl,
+					'limit' => $limit,
+					'page' => $page,
+				);
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
 }

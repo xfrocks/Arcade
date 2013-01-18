@@ -96,6 +96,26 @@ abstract class Arcade_System {
 		$template = $view->createTemplateObject($templateName, array('game' => $game));
 		return $this->_renderPlayer($template, $game);
 	}
+
+	protected static function _getSystemModel() {
+		static $systemModel = false;
+
+		if ($systemModel === false) {
+			$systemModel = XenForo_Model::create('Arcade_Model_System');
+		}
+
+		return $systemModel;
+	}
+
+	protected static function _getModelFromCache($class) {
+		$systemModel = self::_getSystemModel();
+
+		if ($class === 'Arcade_Model_System') {
+			return $systemModel;
+		} else {
+			return $systemModel->getModelFromCache($class);
+		}
+	}
 	
 	public static function create($class) {
 		$createClass = XenForo_Application::resolveDynamicClass($class, 'arcade');
