@@ -785,7 +785,7 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
   </route_prefixes>
   <style_properties/>
   <templates>
-    <template title="arcade.css" version_id="9" version_string="0.0.8.1"><![CDATA[/** column style and width **/
+    <template title="arcade.css" version_id="10" version_string="0.0.8.2"><![CDATA[/** column style and width **/
 
 .gameList .sectionHeaders,
 .gameListItem {
@@ -890,13 +890,8 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
 	}
 	
 		/* first row */
-		.gameListItem .title {
-			font-size: 11pt;
-			float: left;
-		}
 		
 		/* second row */
-		
 		.gameListItem .secondRow {
 			font-size: 11px;
 			/*clear: both;*/
@@ -913,6 +908,7 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
 				}
 
 /** bottom summary **/
+
 
 .gameList .sectionFooter {
 	overflow: hidden; zoom: 1;
@@ -945,13 +941,13 @@ a.GameVoteLink.GameVoted {
 .gameListItem .image { line-height: 0; }
 .gameListItem .image, .gameListItem .champion { padding: 5px 0; }
 .gameListItem .title { font-size: 20px; }
-.scores { width: 300px; text-align: center; }
-.gameStats { width: 150px; text-align: center; }
+.scores { padding: 5px 0; text-align: center; }
+.gameStats { padding: 5px 0; text-align: center; }
 .gameListItem .personalBest { background: {xen:property primaryLightest} url('{xen:property imagePath}/xenforo/gradients/category-23px-light.png') repeat-x center top; }
 
-.highscores { list-style: decimal; font-size: 11px; margin: 5px auto; width: 200px; }
+.highscores { list-style: decimal; font-size: 11px; margin: 5px auto; padding: 5px 0; }
 .highscores td:first-child { color: #aaa; }
-.highscores .name { width: 140px; text-align: right; padding-right: 7px; overflow: hidden; }
+.highscores .name { width: 100px; text-align: right; padding-right: 7px; overflow: hidden; }
 .highscores .datscore { text-align: left; }
 .gameListItem .secondRow { color: #999; }
 
@@ -1005,7 +1001,10 @@ a.GameVoteLink.GameVoted {
 <xen:if is="{$category} AND {$totalGames}">
 	<xen:pagenav link="arcade/browse" linkdata="{$category}" page="{$page}" perpage="{$gamesPerPage}" total="{$totalGames}" />
 </xen:if>]]></template>
-    <template title="arcade_game_list_item" version_id="9" version_string="0.0.8.1"><![CDATA[<xen:require css="arcade.css" />
+    <template title="arcade_game_list_item" version_id="10" version_string="0.0.8.2"><![CDATA[<xen:require css="arcade.css" />
+<xen:require css="node_list.css" />
+<xen:require css="node_forum.css" />
+
 
 <li class="gameListItem">
 	<div class="listBlock image">
@@ -1016,18 +1015,17 @@ a.GameVoteLink.GameVoted {
 
 	<div class="listBlock theTitle">
 		<div class="titleText">
-			<h3 class="title">
+			<h3 class="nodeTitle">
 				<xen:if is="{$xenOptions.xfarcade_play_display} == 1">
-					<a href="{xen:link 'arcade/play', $game}">{$game.title}</a>
+					<a href="{xen:link 'arcade/play', $game}" data-description="#gameDescription-{$game.game_id}"><span class="title">{$game.title}</span></a>
 				<xen:else />
-					<a class="OverlayTrigger" href="{xen:link 'arcade/play', $game}">{$game.title}</a>
+					<a class="OverlayTrigger" href="{xen:link 'arcade/play', $game}" data-description="#gameDescription-{$game.game_id}"><span class="title">{$game.title}</span></a>
 				</xen:if>
 			</h3>
+                        <blockquote class="nodeDescription nodeDescriptionTooltip baseHtml" id="gameDescription-{$game.game_id}"><xen:if is="{$game.description}">{$game.description}<xen:else />{$game.title}</xen:if></blockquote>
 
 			<div class="secondRow">
-				{$game.description}
-				<div class="controls faint">
-				
+				<div class="controls faint">				
 					<xen:if is="{$enableCategories}">
 						<a href="{xen:link 'full:arcade/browse', {xen:array 'category_id={$game.category_id}', 'title={$game.category_title}'}}" class="EditControl">{$game.category_title}</a>
 					</xen:if>
