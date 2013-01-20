@@ -247,33 +247,33 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 			'signature' => XenForo_Input::STRING,
 			'userID' => XenForo_Input::UINT,
 			'sessionID' => XenForo_Input::STRING,
-			'submission' => XenForo_Input::STRING,	
+			'submission' => XenForo_Input::STRING,
 			'score' => XenForo_Input::UINT,
 		));
 
 		if ($params['submission'] != 'score') {
 			return $this->responseNoPermission();
 		}
-		
+
 		if ($params['userID'] != XenForo_Visitor::getUserId()) {
 			return $this->responseNoPermission();
 		}
-		
-		$validation = array();
-		$postKeys = array_keys($_POST);
-		asort($postKeys);
-		foreach ($postKeys as $postKey) {
-			if ($postKey != 'signature') {
-				$validation[] = sprintf('%s=%s', $postKey, rawurldecode($_POST[$postKey]));
-			}
-		}
-		$validationStr = implode('&', $validation);
-		$validationStr .= Arcade_Option::get('mochimedia_key');
-		$validationMd5 = md5($validationStr);
-		if ($validationMd5 !== $params['signature']) {
-			return $this->responseNoPermission();
-		}
-		
+
+          // Validate the Mochi score signature
+          $validationStr = "";
+          ksort($_POST);
+          foreach($_POST as $varname => $varvalue) {
+               if($varname!="signature") {
+                    $validationStr .= sprintf("%s=%s&", $varname, rawurlencode($varvalue));
+               }
+          }
+          $validationStr = substr($validationStr, 0, strlen($validationStr)-1);
+          $validationStr .= Arcade_Option::get('mochimedia_key');
+          if(md5($validationStr) !== $_POST['signature']) {
+               // It's not a valid score submission!
+               return $this->responseNoPermission();
+          }
+
 		// note: sessionId is actually the game slug
 		$game = $this->_getGameOrError($params['sessionID']);
 
