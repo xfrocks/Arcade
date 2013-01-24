@@ -967,7 +967,7 @@ a.GameVoteLink.GameVoted {
 <li>&nbsp;{xen:phrase arcade_copyright}</li>
 </xen:if>
 ]]></template>
-    <template title="arcade_game_list" version_id="1" version_string="0.9"><![CDATA[<xen:require css="arcade.css" />
+    <template title="arcade_game_list" version_id="15" version_string="0.0.9"><![CDATA[<xen:require css="arcade.css" />
 
 <form action="<xen:if is="{$category}">{xen:link 'arcade/browse', $category}<xen:else />{xen:link arcade}</xen:if>" method="post" class="gameList">
 	<dl class="sectionHeaders">
@@ -998,8 +998,12 @@ a.GameVoteLink.GameVoted {
 	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
 </form>
 
-<xen:if is="{$category} AND {$totalGames}">
-	<xen:pagenav link="arcade/browse" linkdata="{$category}" page="{$page}" perpage="{$gamesPerPage}" total="{$totalGames}" />
+<xen:if is="{$totalGames}">
+	<xen:if is="{$category}">
+		<xen:pagenav link="arcade/browse" linkdata="{$category}" page="{$page}" perpage="{$gamesPerPage}" total="{$totalGames}" />
+	<xen:else />
+		<xen:pagenav link="arcade" page="{$page}" perpage="{$gamesPerPage}" total="{$totalGames}" />
+	</xen:if>
 </xen:if>]]></template>
     <template title="arcade_game_list_item" version_id="10" version_string="0.0.8.2"><![CDATA[<xen:require css="arcade.css" />
 <xen:require css="node_list.css" />
@@ -1102,7 +1106,7 @@ a.GameVoteLink.GameVoted {
 {xen:phrase arcade_not_recommend}
 </a>
 </span>]]></template>
-    <template title="arcade_index" version_id="9" version_string="0.0.8.1"><![CDATA[<xen:require css="arcade.css" />
+    <template title="arcade_index" version_id="15" version_string="0.0.9"><![CDATA[<xen:require css="arcade.css" />
 
 <xen:title>{xen:phrase arcade}</xen:title>
 <xen:h1>{xen:phrase arcade}</xen:h1>
@@ -1122,6 +1126,11 @@ a.GameVoteLink.GameVoted {
 		<li id="all">
 			<xen:include template="arcade_game_list">
 				<xen:map from="$allGames" to="$games" />
+				<xen:map from="$allGamesPage" to="$page" />
+				<xen:map from="$allGamesStartOffset" to="$gameStartOffset" />
+				<xen:map from="$allGamesEndOffset" to="$gameEndOffset" />
+				<xen:map from="$allGamesTotal" to="$totalGames" />
+				<xen:set var="$category"></xen:set>
 			</xen:include>
 		</li>
 		<li id="new">

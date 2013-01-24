@@ -85,12 +85,21 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly 
 
 			$gameModel = $this->_getGameModel();
 			$categoryModel = $this->_getCategoryModel();
-
+			
 			$categories = $categoryModel->getCategories(0);
-			$allGames = $gameModel->getGames(array(), $this->_getGameFetchOptions(array(
+			
+			$allGamesPage = max(1, $this->_input->filterSingle('page', XenForo_Input::UINT));
+			$gamesPerPage = Arcade_Option::get('gamesPerPage');
+			$allGamesCondition = array();
+			$allGamesFetchOptions = $this->_getGameFetchOptions(array(
 				'order' => 'play_count',
 				'direction' => 'desc',
-			)));
+				'page' => $allGamesPage,
+				'limit' => $gamesPerPage,
+			));
+			$allGames = $gameModel->getGames($allGamesCondition, $allGamesFetchOptions);
+			$allGamesTotal = $gameModel->countGames($allGamesCondition, $allGamesFetchOptions);
+			
 			$newGames = $gameModel->getGames(array(), $this->_getGameFetchOptions(array(
 				'order' => 'game_id',
 				'direction' => 'desc',
@@ -98,6 +107,13 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly 
 			$randomGames = $gameModel->getGames(array(), $this->_getGameFetchOptions(array(
 				'order' => 'random',
 			)));
+			
+			$enableCategories = Arcade_Option::get('enable_categories');
+			if ($allGamesPage > 1) {
+				// this is the second page
+				// disable categories in all page except the first one!
+				$enableCategories = false;
+			}
 
 			$viewParams = array(
 				'categories' => $categories,
@@ -105,7 +121,13 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly 
 				'newGames' => $newGames,
 				'randomGames' => $randomGames,
 				'canVote' => $canVote,
-				'enableCategories' => $options->xfarcade_enable_categories,
+				'enableCategories' => $enableCategories,
+			
+				'gamesPerPage' => $gamesPerPage,
+				'allGamesPage' => $allGamesPage,
+				'allGamesStartOffset' => ($allGamesPage - 1) * $gamesPerPage + 1,
+				'allGamesEndOffset' => ($allGamesPage - 1) * $gamesPerPage + count($allGames) ,
+				'allGamesTotal' => $allGamesTotal,
 			);
 
 			$response = $this->responseView('Arcade_ViewPublic_Index', 'arcade_index', $viewParams);
