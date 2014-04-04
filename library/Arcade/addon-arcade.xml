@@ -116,7 +116,7 @@
 
 <xen:comment>{xen:if '{$game.game_id}', '', '{xen:phrase arcade_add_new_game_explain}'}</xen:comment>
 
-<xen:require js="js/arcade/functions.js" />
+<xen:require js="js/Arcade/functions.js" />
 
 <xen:form action="{xen:adminlink 'arcade/save-game'}" class="GameEditor" enctype="multipart/form-data">
 	<xen:include template="arcade_game_edit_inputs">
@@ -170,8 +170,10 @@
 	
 <xen:if is="!{$isImporting}"><fieldset></xen:if>
 	<xen:selectunit label="{xen:phrase arcade_system}" name="{$inputPrefix}[system_id]" value="{$game.system_id}"
-		inputclass="GameSystemOptions" data-optionsUrl="{xen:adminlink arcade/system-options}" data-optionsTarget="#GameSystemOptionsTarget"
-		class="{xen:if '{$errors.system_id}', 'error'}">
+					inputclass="GameSystemOptions"
+					data-url="{xen:adminlink arcade/system-options}"
+					data-target="#GameSystemOptionsTarget"
+					class="{xen:if '{$errors.system_id}', 'error'}">
 		<xen:option value=""></xen:option>
 		<xen:options source="$systemsSource" />	
 		<xen:explain>{xen:if '{$game.game_id}', '', '{xen:phrase arcade_system_option_explain}'}</xen:explain>
@@ -864,15 +866,15 @@ a.GameVoteLink.GameVoted {
 		</div>
 	</div>
 </li>]]></template>
-    <template title="arcade_game_vote" version_id="1" version_string="0.9"><![CDATA[<xen:require js="js/arcade/frontend.js" />
+    <template title="arcade_game_vote" version_id="16" version_string="0.1.6"><![CDATA[<xen:require js="js/Arcade/frontend.js" />
 
-<span class="game-vote-{$game.game_id}" data-votedMessage="{xen:phrase arcade_you_have_already_voted_this}">
-<a href="{xen:link 'arcade/vote', $game, "d=up"}" class="GameVoteLink<xen:if is="{$game.voted_up}"> GameVoted</xen:if>" data-gameId="{$game.game_id}">
+<span class="game-vote-{$game.game_id}" data-message="{xen:phrase arcade_you_have_already_voted_this}">
+<a href="{xen:link 'arcade/vote', $game, "d=up"}" class="GameVoteLink<xen:if is="{$game.voted_up}"> GameVoted</xen:if>" data-gameid="{$game.game_id}">
 {xen:number {$game.vote_up}}
 {xen:phrase arcade_recommend}
 </a>
 -
-<a href="{xen:link 'arcade/vote', $game, "d=down"}" class="GameVoteLink<xen:if is="{$game.voted_date} AND !{$game.voted_up}"> GameVoted</xen:if>" data-gameId="{$game.game_id}">
+<a href="{xen:link 'arcade/vote', $game, "d=down"}" class="GameVoteLink<xen:if is="{$game.voted_date} AND !{$game.voted_up}"> GameVoted</xen:if>" data-gameid="{$game.game_id}">
 {xen:number {$game.vote_down}}
 {xen:phrase arcade_not_recommend}
 </a>
