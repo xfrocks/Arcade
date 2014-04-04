@@ -514,7 +514,7 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="option_xfarcade_pc_title" version_id="9" version_string="0.0.8.1"><![CDATA[Defeated conversation title]]></phrase>
     <phrase title="option_xfarcade_pc_title_explain" version_id="15" version_string="0.0.9"><![CDATA[<b>NOT CURRENTLY FUNCTIONAL</b> <strike>Enter the title for the PM that will be sent to the previous champion when their highscore is beaten.</strike>]]></phrase>
     <phrase title="option_xfarcade_play_display" version_id="9" version_string="0.0.8.1"><![CDATA[Game display mode]]></phrase>
-    <phrase title="option_xfarcade_play_display_explain" version_id="15" version_string="0.0.9"><![CDATA[<b>NOT FULLY FUNCTIONAL - WILL BE REMOVED OR REWORKED</b> <strike>Select the way in which active games should be displayed.</strike>]]></phrase>
+    <phrase title="option_xfarcade_play_display_explain" version_id="16" version_string="0.1.6"><![CDATA[Select the way in which active games should be displayed.]]></phrase>
     <phrase title="permission_group_xfarcade" version_id="1" version_string="0.9"><![CDATA[XF Arcade]]></phrase>
     <phrase title="permission_interface_xfarcade" version_id="1" version_string="0.9"><![CDATA[XF Arcade]]></phrase>
     <phrase title="permission_xfarcade_xfarcade_can_comment" version_id="1" version_string="0.9"><![CDATA[Can comment on games]]></phrase>
@@ -532,7 +532,7 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
   </route_prefixes>
   <style_properties/>
   <templates>
-    <template title="arcade.css" version_id="15" version_string="0.0.9"><![CDATA[/* *** XF ARCADE *** */
+    <template title="arcade.css" version_id="16" version_string="0.1.6"><![CDATA[/* *** XF ARCADE *** */
 /** column style and width **/
 
 .gameList .sectionHeaders,
@@ -690,7 +690,12 @@ a.GameVoteLink.GameVoted {
 .highscores .datscore { text-align: left; }
 .gameListItem .secondRow { color: #999; }
 
-.gameList .theTitle { padding-left: 5px; }]]></template>
+.gameList .theTitle { padding-left: 5px; }
+
+.gamePlayer
+{
+	text-align: center;
+}]]></template>
     <template title="arcade_category_browse" version_id="15" version_string="0.0.9"><![CDATA[<xen:require css="arcade.css" />
 
 <xen:title>{xen:phrase arcade_category} {$category.title}</xen:title>
@@ -953,8 +958,10 @@ a.GameVoteLink.GameVoted {
 	<li><a href="{$href}">{$title}</a></li>
 	</xen:foreach>
 </ul>]]></template>
-    <template title="arcade_play" version_id="15" version_string="0.0.9"><![CDATA[<xen:title>{xen:phrase arcade_play} {$game.title}</xen:title>
+    <template title="arcade_play" version_id="16" version_string="0.1.6"><![CDATA[<xen:title>{xen:phrase arcade_play} {$game.title}</xen:title>
 <xen:h1>{$game.title}</xen:h1>
+
+<xen:require css="arcade.css" />
 
 <xen:if is="{$game.description}">
 <xen:description>{$game.description}</xen:description>
@@ -966,16 +973,10 @@ a.GameVoteLink.GameVoted {
 	<xen:breadcrumb href="{xen:link full:arcade, $game}">{$game.title}</xen:breadcrumb>
 </xen:navigation>
 
-<xen:if is="{$xenOptions.xfarcade_play_display} == 1">
-	<div class="sectionMain">
-<xen:else />
-	<div class="xenForm sectionMain">
-</xen:if>
-
-<div class="actionList">
-{xen:raw $player}
-</div>
-
+<div class="sectionMain">
+	<div class="primaryContent gamePlayer">
+		{xen:raw $player}
+	</div>
 </div>]]></template>
     <template title="arcade_player_core" version_id="1" version_string="0.9"><![CDATA[<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
 	codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,14,0"
