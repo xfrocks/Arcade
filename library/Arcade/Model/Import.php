@@ -194,12 +194,6 @@ class Arcade_Model_Import extends XenForo_Model
 
 	protected function _detectSystemId($dir, array &$gameInfo)
 	{
-		$mochiMetadataFilePath = Arcade_Helper_File::buildPath($dir, '__metadata__.json');
-		if (file_exists($mochiMetadataFilePath))
-		{
-			return 'mochi';
-		}
-
 		$childDirs = Arcade_Helper_File::getContentsInside($dir, Arcade_Helper_File::FLAG_DIRECTORY);
 		foreach ($childDirs as $childDir)
 		{

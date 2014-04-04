@@ -260,75 +260,11 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 		)));
 	}
 
-	public function actionMochiGateway()
-	{
-		$params = $this->_input->filter(array(
-			'signature' => XenForo_Input::STRING,
-			'userID' => XenForo_Input::UINT,
-			'sessionID' => XenForo_Input::STRING,
-			'submission' => XenForo_Input::STRING,
-			'score' => XenForo_Input::UINT,
-		));
-
-		if ($params['submission'] != 'score')
-		{
-			return $this->responseNoPermission();
-		}
-
-		if ($params['userID'] != XenForo_Visitor::getUserId())
-		{
-			return $this->responseNoPermission();
-		}
-
-		// Validate the Mochi score signature
-		$validationStr = "";
-		ksort($_POST);
-		foreach ($_POST as $varname => $varvalue)
-		{
-			if ($varname != "signature")
-			{
-				$validationStr .= sprintf("%s=%s&", $varname, rawurlencode($varvalue));
-			}
-		}
-		$validationStr = substr($validationStr, 0, strlen($validationStr) - 1);
-		$validationStr .= Arcade_Option::get('mochimedia_key');
-		if (md5($validationStr) !== $_POST['signature'])
-		{
-			// It's not a valid score submission!
-			return $this->responseNoPermission();
-		}
-
-		// note: sessionId is actually the game slug
-		$game = $this->_getGameOrError($params['sessionID']);
-
-		$sessionId = $this->_getSessionModel()->saveSession($game, XenForo_Visitor::getInstance()->toArray(), array(
-			'time_start' => XenForo_Application::$time,
-			'time_finish' => XenForo_Application::$time,
-			'type' => 1,
-			'challenge_id' => 0,
-			'score' => $params['score'],
-		));
-
-		// TODO: skip redirecting to session burn maybe?
-		// I don't really know why we have to do this...
-		return $this->responseRedirect(XenForo_ControllerResponse_Redirect::SUCCESS, XenForo_Link::buildPublicLink('arcade', array(), array(
-			'sessdo' => 'burn',
-			'id' => $sessionId,
-			'microone' => $this->_getMicrotime(true),
-		)));
-	}
-
 	protected function _checkCsrf($action)
 	{
 		if (strtolower($action) === 'index')
 		{
 			/* bypass CSRF check for entry point */
-			self::$_executed['csrf'] = true;
-			return true;
-		}
-		elseif (strtolower($action) == 'mochigateway')
-		{
-			// bypass CSRF check for mochi callback
 			self::$_executed['csrf'] = true;
 			return true;
 		}

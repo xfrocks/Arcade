@@ -13,11 +13,6 @@ class Arcade_Model_System extends XenForo_Model
 			'class' => 'Arcade_System_IPB',
 			'name' => 'IPB',
 		),
-		array(
-			'system_id' => 'mochi',
-			'class' => 'Arcade_System_Mochi',
-			'name' => 'Mochi',
-		),
 	);
 
 	public function getSystems()

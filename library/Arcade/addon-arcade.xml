@@ -7,7 +7,6 @@
     <navigation navigation_id="arcade_game_list" parent_navigation_id="arcade_games" display_order="1" link="arcade/games" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
     <navigation navigation_id="arcade_games" parent_navigation_id="arcade" display_order="1" link="arcade/games" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
     <navigation navigation_id="arcade_import" parent_navigation_id="arcade_games" display_order="9999" link="arcade/import" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
-    <navigation navigation_id="arcade_import_mochi" parent_navigation_id="arcade_games" display_order="9999" link="arcade/import-mochi" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
     <navigation navigation_id="arcade_options" parent_navigation_id="arcade" display_order="100" link="options/list/xfarcade" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
   </admin_navigation>
   <admin_permissions>
@@ -22,44 +21,6 @@
 	}
 	.ctrlUnit.error .textCtrl {
 		border-color: red;
-	}
-
-.Arcade_ImportMochi_Grid {
-}
-{xen:helper clearfix, '.Arcade_ImportMochi_Grid'}
-	.Arcade_ImportMochi_Game {
-		display: block;
-		float: left;
-		height: 250px;
-		margin-right: 20px;
-		width: 150px;
-	}
-	.Arcade_ImportMochi_Game .thumbnail {
-		height: 150px;
-		width: 150px;
-	}
-		.Arcade_ImportMochi_Game .thumbnail img {
-			width: 150px;
-		}
-	.Arcade_ImportMochi_Game .description {
-		display: none;
-	}
-	.Arcade_ImportMochi_Game span.tick {
-		color: green;
-	}
-
-.Arcade_ImportMochi_DescriptionTooltip {
-	width: 250px;
-	height: auto;
-}
-
-	.Arcade_ImportMochi_DescriptionTooltip .arrow {
-		border: 6px solid transparent;
-		border-bottom-color: {xen:property tooltip.background-color};
-		border-top: 1px none black;
-		top: -6px;
-		left: 122px;
-		right: auto;
 	}]]></template>
     <template title="arcade_category_delete"><![CDATA[<xen:title>{xen:phrase arcade_confirm_deletion_of_category}: {$category.title}</xen:title>
 <xen:h1>{xen:phrase arcade_confirm_deletion_of_category}</xen:h1>
@@ -289,190 +250,6 @@
 </xen:foreach>
 
 {xen:raw $customizedOptions}]]></template>
-    <template title="arcade_import_mochi"><![CDATA[<xen:require css="arcade.css" />
-
-<xen:title>{xen:phrase arcade_import_mochi_games}</xen:title>
-
-<xen:form action="{xen:adminlink 'arcade/import-mochi'}">
-	
-	<xen:if is="{$queue}">
-		<fieldset>
-			<xen:controlunit label="{xen:phrase arcade_import_mochi_games_queue}:">
-				<xen:html>
-					<ul>
-						<xen:foreach loop="$queue" key="$queuedZip" value="$queuedName">
-							<li>
-								<label>
-									<input type="checkbox"
-										name="queue[{$queuedZip}]"
-										value="{xen:jsescape $queuedName}" 
-										checked="checked" />
-									{$queuedName}
-								</label>
-							</li>
-						</xen:foreach>
-					</ul>
-				</xen:html>
-			</xen:controlunit>
-		</fieldset>
-		
-		<xen:submitunit>
-			<input type="submit" name="import" value="{xen:phrase arcade_import}" class="button" />
-		</xen:submitunit>
-	</xen:if>
-	
-	<fieldset>
-		<xen:textboxunit label="{xen:phrase arcade_import_mochi_games_keyword}"
-			name="q" value="{$params.q}" />
-		
-		<xen:selectunit label="{xen:phrase arcade_import_mochi_games_category}"
-			name="category" value="{$params.category}"
-			explain="{xen:phrase arcade_import_mochi_games_category_explain}">
-			<xen:option value=""></xen:option>
-			<xen:options source="{$categories}" />
-		</xen:selectunit>
-		
-		<xen:selectunit label="{xen:phrase arcade_import_mochi_games_rating}"
-			name="rating" value="{$params.rating}"
-			explain="{xen:phrase arcade_import_mochi_games_rating_explain}">
-			<xen:option value=""></xen:option>
-			<xen:options source="{$ratings}" />
-		</xen:selectunit>
-		
-		<xen:selectunit label="{xen:phrase arcade_import_mochi_games_quality}"
-			name="quality" value="{$params.quality}"
-			explain="{xen:phrase arcade_import_mochi_games_quality_explain}">
-				<xen:option value=""></xen:option>
-				<xen:option value="&gt;=3">{xen:phrase arcade_import_mochi_games_quality_gt_eq_3}</xen:option>
-				<xen:option value="&gt;=4">{xen:phrase arcade_import_mochi_games_quality_gt_eq_4}</xen:option>
-		</xen:selectunit>
-		
-		<xen:checkboxunit label="" explain="{xen:phrase arcade_import_mochi_games_leaderboard_enabled_explain}">
-			<xen:option name="leaderboard" value="1"
-				selected="{$params.leaderboard}">
-				{xen:phrase arcade_import_mochi_games_leaderboard_enabled}
-			</xen:option>
-		</xen:checkboxunit>
-		
-		<xen:checkboxunit label="" explain="{xen:phrase arcade_import_mochi_games_no_chinese_games_explain}">
-			<xen:option name="no_chinese" value="1"
-				selected="{$params.no_chinese}">
-				{xen:phrase arcade_import_mochi_games_no_chinese_games}
-			</xen:option>
-		</xen:checkboxunit>
-	</fieldset>
-	
-	<xen:if is="{$feed}">
-		<xen:comment>display a second filter button for quick access</xen:comment>
-		<xen:submitunit save="{xen:phrase filter}" />
-	</xen:if>
-	
-	<fieldset>
-		<xen:if is="{$feed.games}">
-			<div class="Arcade_ImportMochi_Grid">
-				<xen:foreach loop="$feed.games" i="$i" value="$game">
-					<div class="Arcade_ImportMochi_Game">
-						<div class="thumbnail"><img src="{$game.thumbnail_url}" /></div>
-						
-						<div class="name">
-							<input type="checkbox"
-								name="queue[{$game.zip_url}]"
-								value="{xen:jsescape $game.name}" />
-							
-							<a href="{$game.game_url}" target="_blank" data-description="#game-description-{$i}">
-								{$game.name}
-							</a>
-						</div>
-						
-						<div class="resolution">{$game.resolution}</div>
-						
-						<xen:if is="{$game.leaderboard_enabled}">
-							<div class="leaderboard_enabled">
-								<span class="tick">✔</span>
-								{xen:phrase arcade_import_mochi_games_leaderboard_enabled}
-							</div>
-						</xen:if>
-						
-						<xen:if is="{$game.recommended}">
-							<div class="recommended">
-								<span class="tick">✔</span>
-								<span class="Tooltip" title="{xen:phrase arcade_import_mochi_games_recommended_explain}">
-									{xen:phrase arcade_import_mochi_games_recommended}
-								</span>
-							</div>
-						</xen:if>
-						
-						<div id="game-description-{$i}" class="description">
-							<div class="info-description">{$game.description}</div>
-							<br/>
-							<div class="info-category">
-								{xen:phrase arcade_import_mochi_games_category}:
-								{xen:helper implode, $game.categories, ', '}
-							</div>
-							<div class="info-rating">
-								{xen:phrase arcade_import_mochi_games_rating}:
-								{$game.rating}
-							</div>
-							<div class="info-quality">
-								{xen:phrase arcade_import_mochi_games_quality}:
-								{$game.recommendation}/5
-							</div>
-						</div>
-					</div>
-				</xen:foreach>
-			</div>
-			
-			<xen:adminpagenav perpage="{$feed.limit}" total="{$feed.total}" page="{$feed.page}"
-				link="arcade/import-mochi" linkparams="{$params}" />
-		<xen:else />
-			{xen:phrase arcade_import_mochi_games_no_found}
-		</xen:if>
-	</fieldset>
-
-
-	<xen:submitunit save="{xen:phrase filter}">
-		<input type="submit" name="import" value="{xen:phrase arcade_import}" class="button" />
-	</xen:submitunit>
-	
-	<input type="hidden" name="_xfConfirm" value="1" />
-</xen:form>
-
-<script type="text/javascript">
-!function($, window, document, _undefined) {
-	XenForo.Arcade_ImportMochi_DescriptionTooltip = function($title)
-	{
-		var description = $title.data('description');
-
-		if (description && $(description).length)
-		{
-			$(description)
-				.addClass('xenTooltip Arcade_ImportMochi_DescriptionTooltip')
-				.appendTo('body')
-				.append('<span class="arrow" />');
-
-			$title.tooltip(XenForo.configureTooltipRtl(
-			{
-				effect: 'slide',
-				slideOffset: 30,
-				offset: [ 50, 0 ],
-				slideInSpeed: XenForo.speed.xfast,
-				slideOutSpeed: 50 * XenForo._animationSpeedMultiplier,
-
-				/*effect: 'fade',
-				fadeInSpeed: XenForo.speed.xfast,
-				fadeOutSpeed: XenForo.speed.xfast,*/
-
-				predelay: 250,
-				position: 'bottom center',
-				tip: description
-			}));
-			$title.click(function() { $(this).data('tooltip').hide(); });
-		}
-	};
-	
-	XenForo.register('.Arcade_ImportMochi_Game .name a', 'XenForo.Arcade_ImportMochi_DescriptionTooltip');
-}(jQuery, this, document);
-</script>]]></template>
     <template title="arcade_import_step1"><![CDATA[<xen:title>{xen:phrase arcade_import}</xen:title>
 
 <xen:form action="{xen:adminlink 'arcade/import'}" enctype="multipart/form-data">
@@ -529,9 +306,6 @@
 	<div id="fileHtml">{$additionalFiles}</div>
 </xen:uploadunit>
 ]]></template>
-    <template title="arcade_system_mochi_options"><![CDATA[<xen:uploadunit label="{xen:phrase arcade_system_option_target}" name="target" value="" explain="{xen:phrase arcade_system_option_target_explain}">
-	<div id="targetHtml">{xen:if "{$targetFound}", {xen:phrase arcade_target_found, "target={$targetPath}"}}</div>
-</xen:uploadunit>]]></template>
   </admin_templates>
   <admin_template_modifications/>
   <code_events/>
@@ -583,18 +357,6 @@
       <sub_options></sub_options>
       <relation group_id="xfarcade" display_order="220"/>
     </option>
-    <option option_id="xfarcade_mochimedia_id" edit_format="textbox" data_type="string" can_backup="1">
-      <default_value></default_value>
-      <edit_format_params></edit_format_params>
-      <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="50"/>
-    </option>
-    <option option_id="xfarcade_mochimedia_key" edit_format="textbox" data_type="string" can_backup="1">
-      <default_value></default_value>
-      <edit_format_params></edit_format_params>
-      <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="51"/>
-    </option>
     <option option_id="xfarcade_pc_message" edit_format="textbox" data_type="string" can_backup="1">
       <default_value>Your score has just been beat. So go back and try again for that champion status.</default_value>
       <edit_format_params>rows=3</edit_format_params>
@@ -636,7 +398,6 @@
     <phrase title="admin_navigation_arcade_game_add" version_id="1" version_string="0.9"><![CDATA[Add New Game]]></phrase>
     <phrase title="admin_navigation_arcade_game_list" version_id="10001" version_string="1.0.1"><![CDATA[List Games]]></phrase>
     <phrase title="admin_navigation_arcade_import" version_id="8" version_string="0.0.8"><![CDATA[Import]]></phrase>
-    <phrase title="admin_navigation_arcade_import_mochi" version_id="14" version_string="0.0.8.4"><![CDATA[Import MochiMedia Games]]></phrase>
     <phrase title="admin_navigation_arcade_options" version_id="1" version_string="0.0.1"><![CDATA[Options]]></phrase>
     <phrase title="admin_permission_arcade" version_id="1" version_string="0.0.1"><![CDATA[XF Arcade]]></phrase>
     <phrase title="arcade" global_cache="1" version_id="1" version_string="0.9"><![CDATA[Arcade]]></phrase>
@@ -679,25 +440,6 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_image_explain_with_image" version_id="1" version_string="0.9"><![CDATA[Select an image to replace current one:<br />{image}]]></phrase>
     <phrase title="arcade_import" version_id="8" version_string="0.0.8"><![CDATA[Import Game]]></phrase>
     <phrase title="arcade_importing_errors" version_id="10" version_string="0.0.8.2"><![CDATA[Importing Errors]]></phrase>
-    <phrase title="arcade_import_mochi_games" version_id="14" version_string="0.0.8.4"><![CDATA[Import MochiMedia Games]]></phrase>
-    <phrase title="arcade_import_mochi_games_category" version_id="14" version_string="0.0.8.4"><![CDATA[Category]]></phrase>
-    <phrase title="arcade_import_mochi_games_category_explain" version_id="14" version_string="0.0.8.4"><![CDATA[Games may contain more than one category, so you may see the same game show up across different categories.]]></phrase>
-    <phrase title="arcade_import_mochi_games_keyword" version_id="14" version_string="0.0.8.4"><![CDATA[Keyword]]></phrase>
-    <phrase title="arcade_import_mochi_games_leaderboard_enabled" version_id="14" version_string="0.0.8.4"><![CDATA[Leaderboard Enabled]]></phrase>
-    <phrase title="arcade_import_mochi_games_leaderboard_enabled_explain" version_id="14" version_string="0.0.8.4"><![CDATA[Champion and highscores are ONLY available for games with leaderboard enabled.]]></phrase>
-    <phrase title="arcade_import_mochi_games_no_chinese_games" version_id="14" version_string="0.0.8.4"><![CDATA[No Chinese Games]]></phrase>
-    <phrase title="arcade_import_mochi_games_no_chinese_games_explain" version_id="14" version_string="0.0.8.4"><![CDATA[Omit Chinese games from filter result.]]></phrase>
-    <phrase title="arcade_import_mochi_games_no_found" version_id="14" version_string="0.0.8.4"><![CDATA[No games found. Try to broaden your filter criteria.]]></phrase>
-    <phrase title="arcade_import_mochi_games_please_queue_to_import" version_id="14" version_string="0.0.8.4"><![CDATA[Please queue games by selecting the check box to import into the system. You can queue multiple games to import at once.]]></phrase>
-    <phrase title="arcade_import_mochi_games_quality" version_id="14" version_string="0.0.8.4"><![CDATA[Quality]]></phrase>
-    <phrase title="arcade_import_mochi_games_quality_explain" version_id="14" version_string="0.0.8.4"><![CDATA[Filter games by recommendation point (on the scale of 1..5).]]></phrase>
-    <phrase title="arcade_import_mochi_games_quality_gt_eq_3" version_id="14" version_string="0.0.8.4"><![CDATA[Good Games (3+)]]></phrase>
-    <phrase title="arcade_import_mochi_games_quality_gt_eq_4" version_id="14" version_string="0.0.8.4"><![CDATA[Featured Games (4+)]]></phrase>
-    <phrase title="arcade_import_mochi_games_queue" version_id="14" version_string="0.0.8.4"><![CDATA[Queued Games]]></phrase>
-    <phrase title="arcade_import_mochi_games_rating" version_id="14" version_string="0.0.8.4"><![CDATA[Rating]]></phrase>
-    <phrase title="arcade_import_mochi_games_rating_explain" version_id="14" version_string="0.0.8.4"><![CDATA[Please be considerate before importing Mature games.]]></phrase>
-    <phrase title="arcade_import_mochi_games_recommended" version_id="14" version_string="0.0.8.4"><![CDATA[Recommended]]></phrase>
-    <phrase title="arcade_import_mochi_games_recommended_explain" version_id="14" version_string="0.0.8.4"><![CDATA[This game is featured by Mochi staff.]]></phrase>
     <phrase title="arcade_instruction" version_id="1" version_string="0.9"><![CDATA[Instruction]]></phrase>
     <phrase title="arcade_instruction_explain" version_id="1" version_string="0.0.1"><![CDATA[Enter the instructions on how to play the game.  ]]></phrase>
     <phrase title="arcade_invalid_category" version_id="1" version_string="0.9"><![CDATA[Invalid category specified.]]></phrase>
@@ -765,10 +507,6 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="option_xfarcade_enable_explain" version_id="9" version_string="0.0.8.1"><![CDATA[]]></phrase>
     <phrase title="option_xfarcade_image_path" version_id="9" version_string="0.0.8.1"><![CDATA[Champion seal image]]></phrase>
     <phrase title="option_xfarcade_image_path_explain" version_id="15" version_string="0.0.9"><![CDATA[<b>NOT CURRENTLY FUNCTIONAL</b> <strike>Enter the path relative to your forum root of an image to use for champion seals. If this is left blank, the phrase arcade_champion_of_x will be used instead.</strike>]]></phrase>
-    <phrase title="option_xfarcade_mochimedia_id" version_id="12" version_string="0.0.8.3"><![CDATA[Mochi Publisher ID]]></phrase>
-    <phrase title="option_xfarcade_mochimedia_id_explain" version_id="12" version_string="0.0.8.3"><![CDATA[Your registered and verified publisher ID for <a href="https://www.mochimedia.com/" target="_blank" tabindex="-1">MochiMedia</a>.]]></phrase>
-    <phrase title="option_xfarcade_mochimedia_key" version_id="12" version_string="0.0.8.3"><![CDATA[Mochi Secret Key]]></phrase>
-    <phrase title="option_xfarcade_mochimedia_key_explain" version_id="12" version_string="0.0.8.3"><![CDATA[]]></phrase>
     <phrase title="option_xfarcade_pc_message" version_id="9" version_string="0.0.8.1"><![CDATA[Defeated conversation message]]></phrase>
     <phrase title="option_xfarcade_pc_message_explain" version_id="15" version_string="0.0.9"><![CDATA[<b>NOT CURRENTLY FUNCTIONAL</b> <strike>Enter the message for the PM that will be sent to the previous champion when their highscore is beaten. BBCode is supported.</strike>]]></phrase>
     <phrase title="option_xfarcade_pc_title" version_id="9" version_string="0.0.8.1"><![CDATA[Defeated conversation title]]></phrase>
@@ -1267,49 +1005,6 @@ a.GameVoteLink.GameVoted {
 		pluginspage="http://www.macromedia.com/go/getflashplayer"
 		type="application/x-shockwave-flash"></embed>
 </object>]]></template>
-    <template title="arcade_player_mochi" version_id="12" version_string="0.0.8.3"><![CDATA[<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-	codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,14,0"
-	width="{$game.system_options.width}"
-	height="{$game.system_options.height}"
-	id="game_object">
-	<param name="movie" value="{$targetUrl}" />
-	<param name="quality" value="high" />
-	<embed src="{$targetUrl}"
-		width="{$game.system_options.width}"
-		height="{$game.system_options.height}"
-		id="game_embedobj"
-		quality="high"
-		pluginspage="http://www.macromedia.com/go/getflashplayer"
-		type="application/x-shockwave-flash"></embed>
-</object>
-
-<div id="leaderboard_bridge"></div>
-<script src="http://xs.mochiads.com/static/pub/swf/leaderboard.js" type="text/javascript"></script>
-<script type="text/javascript">
-	// Mochi Bridge
-	var options = {
-		partnerID: "{xen:jsescape {xen:helper Arcade_getOption, mochimedia_id}}",
-		id: "leaderboard_bridge"
-	};
-	options.gateway = "{xen:jsescape {xen:link 'canonical:arcade/mochi-gateway'}}";
-	options.siteURL = "{xen:jsescape {xen:link 'canonical:index'}}";
-	options.siteName = "{xen:jsescape $xenOptions.boardTitle}";
-	options.sessionID = "{xen:jsescape {xen:raw $game.slug}}";
-
-	<xen:if is="{$visitor.user_id} > 0">
-	options.userID = "{xen:jsescape $visitor.user_id}";
-	options.username = "{xen:jsescape $visitor.username}";
-	options.profileURL = "{xen:jsescape {xen:link 'canonical:members', $visitor}}";
-	<xen:else />
-	options.denyScores = "{xen:jsescape {xen:phrase arcade_please_login_to_submit_score}}";
-	</xen:if>
-	
-	<xen:if is="{$debugMode}">
-	options.debug = "true";
-	</xen:if>
-
-	Mochi.addLeaderboardIntegration(options);
-</script>]]></template>
     <template title="arcade_post_champion_seal" version_id="2" version_string="0.0.2"><![CDATA[<xen:if is="{$post.champion}">
 <dl class="pairsInline"><dt>:){xen:raw $post.champion}</dt></dl>
 </xen:if>]]></template>
