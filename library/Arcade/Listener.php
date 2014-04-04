@@ -38,6 +38,11 @@ class Arcade_Listener
 
 	public static function init_dependencies(XenForo_Dependencies_Abstract $dependencies, array $data)
 	{
+		if (defined('IS_ARCADE_PHP'))
+		{
+			XenForo_Link::setHandlerInfoForGroup('public', array('index' => $data['routesPublic']['arcade']));
+		}
+		
 		XenForo_Template_Helper_Core::$helperCallbacks['arcade_getoption'] = array(
 			'Arcade_Option',
 			'get'
