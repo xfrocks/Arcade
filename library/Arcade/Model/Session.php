@@ -1,8 +1,10 @@
 <?php
 
-class Arcade_Model_Session extends XenForo_Model {
+class Arcade_Model_Session extends XenForo_Model
+{
 
-	public function saveSession(array $game, array $user, array $extraData) {
+	public function saveSession(array $game, array $user, array $extraData)
+	{
 		$bind = $extraData;
 		$bind['game_id'] = $game['game_id'];
 		$bind['user_id'] = $user['user_id'];
@@ -13,13 +15,16 @@ class Arcade_Model_Session extends XenForo_Model {
 		return $this->_getDb()->lastInsertId();
 	}
 
-	public function updateSession($session, array $updateData) {
-		if (!is_array($session)) $session = array('session_id = ?' => intval($session));
+	public function updateSession($session, array $updateData)
+	{
+		if (!is_array($session))
+			$session = array('session_id = ?' => intval($session));
 
 		$this->_getDb()->update('xf_arcade_session', $updateData, $session);
 	}
 
-	public function getTopSessions($gameId, $reversedScoring = false, $limit = 1) {
+	public function getTopSessions($gameId, $reversedScoring = false, $limit = 1)
+	{
 		$db = $this->_getDb();
 		$scoring = $this->_getScoreComparison($reversedScoring);
 		extract($scoring);
@@ -35,7 +40,8 @@ class Arcade_Model_Session extends XenForo_Model {
 			ORDER BY score $scoreDirection, time_finish DESC
 			LIMIT $limit
 		", array($gameId));
-		foreach ($scores as $score) {
+		foreach ($scores as $score)
+		{
 			$whereConditions[] = "(session.score = $score[score] AND session.user_id = $score[user_id])";
 		}
 
@@ -50,14 +56,17 @@ class Arcade_Model_Session extends XenForo_Model {
 
 		$oldCount = count($topScores);
 		$userIds = array();
-		foreach (array_keys($topScores) as $key) {
-			if (in_array($topScores[$key]['user_id'], $userIds)) {
+		foreach (array_keys($topScores) as $key)
+		{
+			if (in_array($topScores[$key]['user_id'], $userIds))
+			{
 				// one score each user only
 				unset($topScores[$key]);
 			}
 			$userIds[] = $topScores[$key]['user_id'];
 		}
-		if (count($topScores) != $oldCount) {
+		if (count($topScores) != $oldCount)
+		{
 			// reset array keys
 			$topScores = array_values($topScores);
 		}
@@ -65,15 +74,17 @@ class Arcade_Model_Session extends XenForo_Model {
 		return $topScores;
 	}
 
-	public function getBestSession($gameId, $reversedScoring = false) {
+	public function getBestSession($gameId, $reversedScoring = false)
+	{
 		$array = $this->getTopSessions($gameId, $reversedScoring);
 
 		return reset($array);
 	}
 
-	public function countBetterUsers($gameId, $userId, $score, $timeFinish, $reversedScoring = false) {
+	public function countBetterUsers($gameId, $userId, $score, $timeFinish, $reversedScoring = false)
+	{
 
-          $scoring = $this->_getScoreComparison($reversedScoring);
+		$scoring = $this->_getScoreComparison($reversedScoring);
 		extract($scoring);
 
 		$better = $this->_getDb()->fetchAll("
@@ -83,16 +94,24 @@ class Arcade_Model_Session extends XenForo_Model {
 				AND user_id > 0
 				AND (score $scoreOperator ? OR (score = ? AND time_finish < ?))
 			GROUP BY user_id
-		", array($gameId, $score, $score, $timeFinish));
+		", array(
+			$gameId,
+			$score,
+			$score,
+			$timeFinish
+		));
 
 		return count($better);
 	}
 
-	public function _getScoreComparison($reversedScoring) {
+	public function _getScoreComparison($reversedScoring)
+	{
 		return Arcade_Model_Game::getScoreComparison($reversedScoring);
 	}
-	
-	public function deleteSessionByGameId($gameId) {
+
+	public function deleteSessionByGameId($gameId)
+	{
 		$this->_getDb()->query('DELETE FROM `xf_arcade_session` WHERE game_id = ?', array($gameId));
 	}
+
 }

@@ -1,15 +1,20 @@
 <?php
+
 /**
  * The primary purpose of this class is to handle requests
- * from games. They are different and... well, ugly. So I 
- * decided to move them here in order to make our primary 
+ * from games. They are different and... well, ugly. So I
+ * decided to move them here in order to make our primary
  * controller look clean and easy to follow
  */
-abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPublic_Abstract {
-	public function actionIndex() {
-		if (!empty($_REQUEST['sessdo'])) {
+abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPublic_Abstract
+{
+	public function actionIndex()
+	{
+		if (!empty($_REQUEST['sessdo']))
+		{
 			/* manually reroute */
-			switch ($_REQUEST['sessdo']) {
+			switch ($_REQUEST['sessdo'])
+			{
 				case 'sessionstart':
 					return $this->responseReroute('Arcade_ControllerPublic_Arcade', 'CoreSessionStart');
 				case 'permrequest':
@@ -24,7 +29,8 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 		return false;
 	}
 
-	public function actionCoreSessionStart() {
+	public function actionCoreSessionStart()
+	{
 		// a game has just been started: save an empty session record
 		$this->_assertPostOnly();
 
@@ -39,10 +45,11 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 
 		echo '&connStatus=1&initbar=' . rand(1, 10) . '&gametime=' . XenForo_Application::$time . '&lastid=' . $sessionId . '&result=OK';
 		echo '<META HTTP-EQUIV=Refresh CONTENT="0; URL=' . XenForo_Link::buildPublicLink('full:arcade') . '>';
-		exit;
+		exit ;
 	}
 
-	public function actionCorePermRequest() {
+	public function actionCorePermRequest()
+	{
 		// submitting score
 		$this->_assertPostOnly();
 
@@ -55,14 +62,16 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 			'fakekey' => XenForo_Input::UINT,
 		));
 
-		if (empty($input['note']) OR empty($input['id']) OR empty($input['fakekey']) OR empty($input['gametime'])) {
+		if (empty($input['note']) OR empty($input['id']) OR empty($input['fakekey']) OR empty($input['gametime']))
+		{
 			// return $this->responseNoPermission();
 		}
 
 		$scoreCeil = ceil($input['score']);
 		$noteId = $input['note'] / ($input['fakekey'] * $scoreCeil);
 
-		if ($noteId != $input['id']) {
+		if ($noteId != $input['id'])
+		{
 			/* invalidate */
 			echo '&validate=0';
 			// exit;
@@ -81,10 +90,11 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 		));
 
 		echo '&validate=1&microone=' . $this->_getMicrotime(true) . '&result=OK';
-		exit;
+		exit ;
 	}
 
-	public function actionCoreBurn() {
+	public function actionCoreBurn()
+	{
 		// let's validate the score
 		// $this->_assertPostOnly();
 
@@ -103,39 +113,43 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 
 		$this->_assertGamePermission('play', $game);
 
-		if (empty($game['session_id']) OR ($game['session_user_id'] != $visitor['user_id']) OR ($game['ping'] > 0 AND Arcade_Option::get('doFraudCheck'))) {
+		if (empty($game['session_id']) OR ($game['session_user_id'] != $visitor['user_id']) OR ($game['ping'] > 0 AND Arcade_Option::get('doFraudCheck')))
+		{
 			return $this->responseNoPermission();
 		}
 
 		$ping = sprintf('%.1f', ($this->_getMicrotime(true) - $input['microone']) / 2 * 1000);
 
-		if ($ping > 4500 AND Arcade_Option::get('doFraudCheck')) {
+		if ($ping > 4500 AND Arcade_Option::get('doFraudCheck'))
+		{
 			$valid = 0;
-		} else {
+		}
+		else
+		{
 			$valid = 1;
 		}
 
 		$sessionModel->updateSession($game['session_id'], array(
-			'ping' => Arcade_Option::get('doFraudCheck')?$ping:0,
+			'ping' => Arcade_Option::get('doFraudCheck') ? $ping : 0,
 			'valid' => $valid,
 		));
 
-		if ($valid) {
+		if ($valid)
+		{
 			$gameModel->buildPlayCount($game['game_id']);
 
-			if ($visitor['user_id']) {
+			if ($visitor['user_id'])
+			{
 				$gameModel->buildLatestScores();
 				$gameModel->buildGamePlay($game, $visitor->toArray(), $game);
 			}
 		}
 
-		return $this->responseRedirect(
-			XenForo_ControllerResponse_Redirect::SUCCESS,
-			XenForo_Link::buildPublicLink('arcade')
-		);
+		return $this->responseRedirect(XenForo_ControllerResponse_Redirect::SUCCESS, XenForo_Link::buildPublicLink('arcade'));
 	}
 
-	public function actionIpbGameData() {
+	public function actionIpbGameData()
+	{
 		$gameSlug = $this->_input->filterSingle('slug', XenForo_Input::STRING);
 		$gameFile = $this->_input->filterSingle('file', XenForo_Input::STRING);
 		$ext = $this->_routeMatch->getResponseType();
@@ -144,31 +158,39 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 		$game = $this->_getGameOrError($gameSlug);
 
 		$url = Arcade_System_IPB::getAdditionalUrl($game, $fileName);
-		if (!empty($url)) {
+		if (!empty($url))
+		{
 			// simply redirect
 			header("Location: " . XenForo_Link::convertUriToAbsoluteUri($url));
-		} else {
+		}
+		else
+		{
 			$filePath = Arcade_System_IPB::getAdditionalFilePath($game, $fileName);
-			if (!empty($filePath) AND file_exists($filePath)) {
+			if (!empty($filePath) AND file_exists($filePath))
+			{
 				// sondh@2013-01-11
 				// dirty fix to support all kind of gamedata file types
 				// we can't use mime_content_type or Fileinfo because
 				// the real file doesn't always have the correct extension...
 				header("Content-Type: application/octet-stream");
 				echo file_get_contents($filePath);
-			} else {
+			}
+			else
+			{
 				// TODO: error?
 			}
 		}
 
-		exit;
+		exit ;
 	}
 
-	public function actionIpbVerifyScore() {
+	public function actionIpbVerifyScore()
+	{
 		// Get two random numbers to do our score verification
 		$randomvar1 = rand(1, 25);
 		$randomvar2 = rand(1, 25);
-		$ttl = 500*60; // 5 minutes?
+		$ttl = 500 * 60;
+		// 5 minutes?
 
 		// Bake a Cookie
 		XenForo_Helper_Cookie::setCookie('xfarcade_v32_cookie', $randomvar1 . ',' . $randomvar2, $ttl);
@@ -176,10 +198,11 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 		// Return the values
 		echo '&randchar=' . $randomvar1 . '&randchar2=' . $randomvar2 . '&savescore=1&blah=OK';
 
-		exit;
+		exit ;
 	}
 
-	public function actionIpbSaveScoreLegacy() {
+	public function actionIpbSaveScoreLegacy()
+	{
 		$input = $this->_input->filter(array(
 			'gscore' => XenForo_Input::STRING,
 			'gname' => XenForo_Input::STRING,
@@ -195,18 +218,15 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 			'score' => $input['gscore'],
 		));
 
-		return $this->responseRedirect(
-			XenForo_ControllerResponse_Redirect::SUCCESS,
-			XenForo_Link::buildPublicLink('arcade', array(), array(
-				'sessdo' => 'burn',
-				'id' => $sessionId,
-				'microone' => $this->_getMicrotime(true),
-			))
-		);
+		return $this->responseRedirect(XenForo_ControllerResponse_Redirect::SUCCESS, XenForo_Link::buildPublicLink('arcade', array(), array(
+			'sessdo' => 'burn',
+			'id' => $sessionId,
+			'microone' => $this->_getMicrotime(true),
+		)));
 	}
 
-
-	public function actionIpbSaveScore() {
+	public function actionIpbSaveScore()
+	{
 		$input = $this->_input->filter(array(
 			'gscore' => XenForo_Input::STRING,
 			'arcadegid' => XenForo_Input::INT,
@@ -216,7 +236,8 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 
 		$randomVars = explode(',', XenForo_Helper_Cookie::getCookie('xfarcade_v32_cookie'));
 
-		if(count($randomVars) != 2 OR $input['enscore'] != ($input['gscore'] * $randomVars[0] ^ $randomVars[1])) {
+		if (count($randomVars) != 2 OR $input['enscore'] != ($input['gscore'] * $randomVars[0] ^ $randomVars[1]))
+		{
 			return $this->responseNoPermission();
 		}
 
@@ -232,17 +253,15 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 
 		XenForo_Helper_Cookie::setCookie('xfarcade_v32_cookie', '', 123);
 
-		return $this->responseRedirect(
-			XenForo_ControllerResponse_Redirect::SUCCESS,
-			XenForo_Link::buildPublicLink('arcade', array(), array(
-				'sessdo' => 'burn',
-				'id' => $sessionId,
-				'microone' => $this->_getMicrotime(true),
-			))
-		);
+		return $this->responseRedirect(XenForo_ControllerResponse_Redirect::SUCCESS, XenForo_Link::buildPublicLink('arcade', array(), array(
+			'sessdo' => 'burn',
+			'id' => $sessionId,
+			'microone' => $this->_getMicrotime(true),
+		)));
 	}
-	
-	public function actionMochiGateway() {
+
+	public function actionMochiGateway()
+	{
 		$params = $this->_input->filter(array(
 			'signature' => XenForo_Input::STRING,
 			'userID' => XenForo_Input::UINT,
@@ -251,28 +270,33 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 			'score' => XenForo_Input::UINT,
 		));
 
-		if ($params['submission'] != 'score') {
+		if ($params['submission'] != 'score')
+		{
 			return $this->responseNoPermission();
 		}
 
-		if ($params['userID'] != XenForo_Visitor::getUserId()) {
+		if ($params['userID'] != XenForo_Visitor::getUserId())
+		{
 			return $this->responseNoPermission();
 		}
 
-          // Validate the Mochi score signature
-          $validationStr = "";
-          ksort($_POST);
-          foreach($_POST as $varname => $varvalue) {
-               if($varname!="signature") {
-                    $validationStr .= sprintf("%s=%s&", $varname, rawurlencode($varvalue));
-               }
-          }
-          $validationStr = substr($validationStr, 0, strlen($validationStr)-1);
-          $validationStr .= Arcade_Option::get('mochimedia_key');
-          if(md5($validationStr) !== $_POST['signature']) {
-               // It's not a valid score submission!
-               return $this->responseNoPermission();
-          }
+		// Validate the Mochi score signature
+		$validationStr = "";
+		ksort($_POST);
+		foreach ($_POST as $varname => $varvalue)
+		{
+			if ($varname != "signature")
+			{
+				$validationStr .= sprintf("%s=%s&", $varname, rawurlencode($varvalue));
+			}
+		}
+		$validationStr = substr($validationStr, 0, strlen($validationStr) - 1);
+		$validationStr .= Arcade_Option::get('mochimedia_key');
+		if (md5($validationStr) !== $_POST['signature'])
+		{
+			// It's not a valid score submission!
+			return $this->responseNoPermission();
+		}
 
 		// note: sessionId is actually the game slug
 		$game = $this->_getGameOrError($params['sessionID']);
@@ -287,32 +311,37 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 
 		// TODO: skip redirecting to session burn maybe?
 		// I don't really know why we have to do this...
-		return $this->responseRedirect(
-			XenForo_ControllerResponse_Redirect::SUCCESS,
-			XenForo_Link::buildPublicLink('arcade', array(), array(
-				'sessdo' => 'burn',
-				'id' => $sessionId,
-				'microone' => $this->_getMicrotime(true),
-			))
-		);
+		return $this->responseRedirect(XenForo_ControllerResponse_Redirect::SUCCESS, XenForo_Link::buildPublicLink('arcade', array(), array(
+			'sessdo' => 'burn',
+			'id' => $sessionId,
+			'microone' => $this->_getMicrotime(true),
+		)));
 	}
 
-	protected function _checkCsrf($action) {
-		if (strtolower($action) === 'index') {
+	protected function _checkCsrf($action)
+	{
+		if (strtolower($action) === 'index')
+		{
 			/* bypass CSRF check for entry point */
 			self::$_executed['csrf'] = true;
 			return true;
-		} elseif (strtolower($action) == 'mochigateway') {
+		}
+		elseif (strtolower($action) == 'mochigateway')
+		{
 			// bypass CSRF check for mochi callback
 			self::$_executed['csrf'] = true;
 			return true;
-		} else {
+		}
+		else
+		{
 			return parent::_checkCsrf($action);
 		}
 	}
 
-	protected function _getMicrotime($getAsFloat = false) {
+	protected function _getMicrotime($getAsFloat = false)
+	{
 		// TODO: support all system?
 		return microtime($getAsFloat);
 	}
+
 }
