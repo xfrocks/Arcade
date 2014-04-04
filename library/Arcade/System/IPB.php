@@ -158,14 +158,14 @@ class Arcade_System_IPB extends Arcade_System_Abstract
 							$gameInfo['system_options']['height'] = $gheight;
 						}
 					}
-
-					if (empty($gameInfo['_gamedata']))
-					{
-						// now process gamedata files, they are usually stored in
-						// package/gamedata/{slug}/...
-						$this->_detectGameDataFiles($dir, $gameInfo, 'gamedata/' . $gameInfo['slug']);
-					}
 				}
+			}
+
+			if (empty($gameInfo['_gamedata']))
+			{
+				// now process gamedata files, they are usually stored in
+				// package/gamedata/{slug}/...
+				$this->_detectGameDataFiles($dir, $gameInfo, 'gamedata/' . $gameInfo['slug']);
 			}
 		}
 
@@ -369,14 +369,18 @@ class Arcade_System_IPB extends Arcade_System_Abstract
 	protected static function _getAdditionalInternal(array $game, $fileName)
 	{
 		if (empty($game['game_id']))
+		{
 			return '';
+		}
 
 		$gameId = $game['game_id'];
 		$group = floor($gameId / 100);
 		$slug = $game['slug'];
 		$options = $game['system_options'];
 		if (!is_array($options))
+		{
 			$options = @unserialize($options);
+		}
 
 		if (!empty($options['files'][$fileName]))
 		{

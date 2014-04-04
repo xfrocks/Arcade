@@ -2,7 +2,68 @@
 
 class Arcade_Installer
 {
-	public static function install($existingAddOn)
+	/* Start auto-generated lines of code. Change made will be overwriten... */
+
+	protected static $_tables = array();
+	protected static $_patches = array();
+
+	public static function install($existingAddOn, $addOnData)
+	{
+		$db = XenForo_Application::get('db');
+
+		foreach (self::$_tables as $table)
+		{
+			$db->query($table['createQuery']);
+		}
+
+		foreach (self::$_patches as $patch)
+		{
+			$tableExisted = $db->fetchOne($patch['showTablesQuery']);
+			if (empty($tableExisted))
+			{
+				continue;
+			}
+
+			$existed = $db->fetchOne($patch['showColumnsQuery']);
+			if (empty($existed))
+			{
+				$db->query($patch['alterTableAddColumnQuery']);
+			}
+		}
+		
+		self::installCustomized($existingAddOn, $addOnData);
+	}
+
+	public static function uninstall()
+	{
+		$db = XenForo_Application::get('db');
+
+		foreach (self::$_patches as $patch)
+		{
+			$tableExisted = $db->fetchOne($patch['showTablesQuery']);
+			if (empty($tableExisted))
+			{
+				continue;
+			}
+
+			$existed = $db->fetchOne($patch['showColumnsQuery']);
+			if (!empty($existed))
+			{
+				$db->query($patch['alterTableDropColumnQuery']);
+			}
+		}
+
+		foreach (self::$_tables as $table)
+		{
+			$db->query($table['dropQuery']);
+		}
+
+		self::uninstallCustomized();
+	}
+
+	/* End auto-generated lines of code. Feel free to make changes below */
+
+	public static function installCustomized($existingAddOn, $addOnData)
 	{
 		$db = XenForo_Application::get('db');
 
@@ -93,7 +154,7 @@ class Arcade_Installer
 		self::_installDemoData($db);
 	}
 
-	public static function uninstall($addonInfo)
+	public static function uninstallCustomized()
 	{
 		$db = XenForo_Application::get('db');
 
@@ -248,7 +309,7 @@ class Arcade_Installer
 										$tmp2Path = XenForo_Helper_File::getInternalDataPath() . '/' . $file2;
 										copy($gamedataPath . '/' . $file2, $tmp2Path);
 										// we have to make a copy because XenForo_Upload will auto-delete the file
-										$files[] = new XenForo_Upload($file2, $tmp2Path);
+										$files[$file2] = new XenForo_Upload($file2, $tmp2Path);
 										$systemOptions['files'][$file2] = XenForo_Application::$time;
 									}
 								}
@@ -283,9 +344,10 @@ class Arcade_Installer
 				}
 			}
 
-			var_dump($children);
 			foreach ($children as $child)
+			{
 				self::_doRmRf($child);
+			}
 		}
 
 		@unlink($path);

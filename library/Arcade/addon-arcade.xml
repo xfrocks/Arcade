@@ -272,6 +272,7 @@
 		<fieldset>
 			<input type="hidden" name="games[{$i}][dir]" value="{$dir}" />
 			
+			<xen:if is="{$dwErrors} AND {$dwErrors.{$dir}}">
 			<xen:controlunit label="{xen:phrase arcade_importing_errors}">
 				<xen:html>
 					<ul>
@@ -281,6 +282,7 @@
 					</ul>
 				</xen:html>
 			</xen:controlunit>
+			</xen:if>
 			
 			<xen:include template="arcade_game_edit_inputs">
 				<xen:set var="$inputPrefix">games[{$i}]</xen:set>
