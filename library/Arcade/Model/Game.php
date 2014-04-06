@@ -96,8 +96,15 @@ class Arcade_Model_Game extends XenForo_Model
 		// TODO: implement this
 	}
 
-	public function buildGamePlay(array $game, array $user, array $session)
+	public function buildGamePlay(array $game, array $session, array $user = null)
 	{
+		// TODO: switch from using $user to $viewingUser for coding convention
+		$this->standardizeViewingUserReference($user);
+		if (empty($user['user_id']))
+		{
+			return;
+		}
+
 		$db = $this->_getDb();
 
 		// we have to query to find our rank
@@ -106,54 +113,66 @@ class Arcade_Model_Game extends XenForo_Model
 
 		if ($rank == 1)
 		{
-			// we got the new champion here!
+			if (!empty($game['highscore_user_id']) AND $game['highscore_user_id'] != $user['user_id'])
+			{
+				// we got the new champion here!
+				if (Arcade_Option::get('championStartConversation') AND $this->_getConversationModel()->canStartConversations($errorPhraseKey, $user))
+				{
+					// try starting a new conversation
+					// TODO: start conversation with old champion language instead of new champion?
+					$convoParams = array(
+						'game' => $game['title'],
+						'game_link' => XenForo_Link::buildPublicLink('canonical:arcade', array(
+							'game_id' => $game['game_id'],
+							'title' => $game['title'],
+							'slug' => $game['slug'],
+						)),
+						'old_highscore' => $game['highscore'],
+						'old_highscore_username' => $game['highscore_username'],
+						'old_highscore_date' => XenForo_Template_Helper_Core::date($game['highscore_date']),
+						'new_highscore' => $session['score'],
+						'board_title' => XenForo_Application::getOptions()->get('boardTitle'),
+					);
 
+					$convoTitle = new XenForo_Phrase('arcade_convo_title', $convoParams);
+					$convoMessage = new XenForo_Phrase('arcade_convo_message', $convoParams);
+
+					$convoTitle = strval($convoTitle);
+					$convoMessage = strval($convoMessage);
+
+					$conversationDw = XenForo_DataWriter::create('XenForo_DataWriter_ConversationMaster');
+					$conversationDw->setExtraData(XenForo_DataWriter_ConversationMaster::DATA_ACTION_USER, $user);
+					$conversationDw->setExtraData(XenForo_DataWriter_ConversationMaster::DATA_MESSAGE, $convoMessage);
+					$conversationDw->set('user_id', $user['user_id']);
+					$conversationDw->set('username', $user['username']);
+					$conversationDw->set('title', $convoTitle);
+					$conversationDw->addRecipientUserNames(array($game['highscore_username']));
+					$messageDw = $conversationDw->getFirstMessageDw()->set('message', $convoMessage);
+					$conversationDw->save();
+
+					$this->_getConversationModel()->markConversationAsRead($conversationDw->get('conversation_id'), $user['user_id'], XenForo_Application::$time);
+				}
+
+				// new update the old champion
+				$oldChampionUserDw = XenForo_DataWriter::create('XenForo_DataWriter_User');
+				$oldChampionUserDw->setExistingData($game['highscore_user_id']);
+				$oldChampionUserDw->Arcade_demoteChampionForGame($game);
+				$oldChampionUserDw->save();
+			}
+
+			// update the new champion
+			$newChampionUserDw = XenForo_DataWriter::create('XenForo_DataWriter_User');
+			$newChampionUserDw->setExistingData($user['user_id']);
+			$newChampionUserDw->Arcade_promoteChampionForGame($game, $session);
+			$newChampionUserDw->save();
+
+			// update the game
 			$db->update('xf_arcade_game', array(
 				'highscore' => $session['score'],
 				'highscore_user_id' => $user['user_id'],
 				'highscore_username' => $user['username'],
 				'highscore_date' => $session['time_finish'],
 			), array('game_id = ?' => $game['game_id']));
-
-			$oldChampion = $this->_getSessionModel()->getBestSession($game['game_id'], $game['reversed_scoring']);
-
-			if ($oldChampion['username'] != $user['username'])
-			{
-				if (!$this->_getConversationModel()->canStartConversations($errorPhraseKey))
-				{
-					throw $this->getErrorOrNoPermissionResponseException($errorPhraseKey);
-				}
-
-				$xfaPcTitle = XenForo_Application::get('options')->xfarcade_pc_title;
-				$xfaPcMessage = XenForo_Application::get('options')->xfarcade_pc_message;
-
-				$visitor = XenForo_Visitor::getInstance();
-
-				$conversationDw = XenForo_DataWriter::create('XenForo_DataWriter_ConversationMaster');
-				$conversationDw->setExtraData(XenForo_DataWriter_ConversationMaster::DATA_ACTION_USER, $visitor->toArray());
-				$conversationDw->set('user_id', $user['user_id']);
-				$conversationDw->set('username', $user['username']);
-				$conversationDw->set('title', $xfaPcTitle);
-				$conversationDw->set('open_invite', '0');
-				$conversationDw->set('conversation_open', '1');
-				$conversationDw->addRecipientUserNames(explode(',', $oldChampion['username']));
-				// checks permissions
-
-				$messageDw = $conversationDw->getFirstMessageDw();
-				$messageDw->set('message', $xfaPcMessage);
-
-				$conversationDw->preSave();
-
-				if (!$conversationDw->hasErrors())
-				{
-					$this->assertNotFlooding('conversation');
-				}
-
-				$conversationDw->save();
-				$conversation = $conversationDw->getMergedData();
-
-				$this->_getConversationModel()->markConversationAsRead($conversation['conversation_id'], XenForo_Visitor::getUserId(), XenForo_Application::$time);
-			}
 
 			//TODO: news feed item
 			//TODO: champion cache
@@ -526,6 +545,17 @@ class Arcade_Model_Game extends XenForo_Model
 		);
 	}
 
+	/**
+	 * @return XenForo_Model_Conversation
+	 */
+	protected function _getConversationModel()
+	{
+		return $this->getModelFromCache('XenForo_Model_Conversation');
+	}
+
+	/**
+	 * @return Arcade_Model_Session
+	 */
 	protected function _getSessionModel()
 	{
 		return $this->getModelFromCache('Arcade_Model_Session');

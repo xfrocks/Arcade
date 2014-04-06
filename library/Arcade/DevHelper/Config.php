@@ -2,7 +2,11 @@
 class Arcade_DevHelper_Config extends DevHelper_Config_Base
 {
 	protected $_dataClasses = array();
-	protected $_dataPatches = array();
+	protected $_dataPatches = array(
+		'xf_user_profile' => array(
+			'arcade_champion' => array('name' => 'arcade_champion', 'type' => 'serialized'),
+		),
+	);
 	protected $_exportPath = '/Users/sondh/XenForo/Arcade';
 	protected $_exportIncludes = array('arcade.php', 'crossdomain.xml');
 

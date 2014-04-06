@@ -5,7 +5,16 @@ class Arcade_Installer
 	/* Start auto-generated lines of code. Change made will be overwriten... */
 
 	protected static $_tables = array();
-	protected static $_patches = array();
+	protected static $_patches = array(
+		array(
+			'table' => 'xf_user_profile',
+			'field' => 'arcade_champion',
+			'showTablesQuery' => 'SHOW TABLES LIKE \'xf_user_profile\'',
+			'showColumnsQuery' => 'SHOW COLUMNS FROM `xf_user_profile` LIKE \'arcade_champion\'',
+			'alterTableAddColumnQuery' => 'ALTER TABLE `xf_user_profile` ADD COLUMN `arcade_champion` MEDIUMBLOB',
+			'alterTableDropColumnQuery' => 'ALTER TABLE `xf_user_profile` DROP COLUMN `arcade_champion`',
+		),
+	);
 
 	public static function install($existingAddOn, $addOnData)
 	{

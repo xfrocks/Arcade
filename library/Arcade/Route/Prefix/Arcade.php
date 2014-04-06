@@ -55,13 +55,15 @@ class Arcade_Route_Prefix_Arcade implements XenForo_Route_Interface
 					break;
 				}
 			}
-			if (isset($data['title']))
-			{
-				$array['slug'] = $data['title'];
-			}
-			elseif (isset($data['slug']))
+
+			if (isset($data['slug']))
 			{
 				$array['slug'] = $data['slug'];
+			}
+
+			if (isset($data['title']))
+			{
+				$array['title'] = $data['title'];
 			}
 		}
 

@@ -83,7 +83,6 @@ class Arcade_Model_Session extends XenForo_Model
 
 	public function countBetterUsers($gameId, $userId, $score, $timeFinish, $reversedScoring = false)
 	{
-
 		$scoring = $this->_getScoreComparison($reversedScoring);
 		extract($scoring);
 

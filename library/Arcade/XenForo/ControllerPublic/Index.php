@@ -1,6 +1,6 @@
 <?php
 
-class Arcade_Extend_ControllerPublic_Index extends XFCP_Arcade_Extend_ControllerPublic_Index
+class Arcade_XenForo_ControllerPublic_Index extends XFCP_Arcade_XenForo_ControllerPublic_Index
 {
 	public function actionIndex()
 	{

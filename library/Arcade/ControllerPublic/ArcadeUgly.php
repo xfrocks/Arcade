@@ -110,6 +110,10 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 		$conditions = array('session_id' => $input['id']);
 		$fetchOptions = array();
 		$game = $gameModel->getGame($conditions, $fetchOptions);
+		if (empty($game))
+		{
+			return $this->responseNoPermission();
+		}
 
 		$this->_assertGamePermission('play', $game);
 
@@ -138,11 +142,8 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 		{
 			$gameModel->buildPlayCount($game['game_id']);
 
-			if ($visitor['user_id'])
-			{
-				$gameModel->buildLatestScores();
-				$gameModel->buildGamePlay($game, $visitor->toArray(), $game);
-			}
+			$gameModel->buildLatestScores();
+			$gameModel->buildGamePlay($game, $game);
 		}
 
 		return $this->responseRedirect(XenForo_ControllerResponse_Redirect::SUCCESS, XenForo_Link::buildPublicLink('arcade'));

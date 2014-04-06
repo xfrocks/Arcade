@@ -317,6 +317,7 @@
     <listener event_id="file_health_check" execute_order="10" callback_class="Arcade_Listener" callback_method="file_health_check" active="1" hint="" description=""/>
     <listener event_id="init_dependencies" execute_order="10" callback_class="Arcade_Listener" callback_method="init_dependencies" active="1" hint="" description=""/>
     <listener event_id="load_class_controller" execute_order="9999" callback_class="Arcade_Listener" callback_method="load_class" active="1" hint="" description=""/>
+    <listener event_id="load_class_datawriter" execute_order="10" callback_class="Arcade_Listener" callback_method="load_class" active="1" hint="" description=""/>
     <listener event_id="navigation_tabs" execute_order="1000" callback_class="Arcade_Listener" callback_method="navigation_tabs" active="1" hint="" description="Add menu links"/>
     <listener event_id="template_hook" execute_order="20" callback_class="Arcade_Template_Hook" callback_method="template" active="1" hint="" description="Adds the champion seal if enabled."/>
   </code_event_listeners>
@@ -336,6 +337,12 @@
       <edit_format_params></edit_format_params>
       <sub_options></sub_options>
       <relation group_id="xfarcade" display_order="210"/>
+    </option>
+    <option option_id="xfarcade_championStartConversation" edit_format="onoff" data_type="unsigned_integer" can_backup="1">
+      <default_value>1</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="xfarcade" display_order="1000"/>
     </option>
     <option option_id="xfarcade_disabled_message" edit_format="textbox" data_type="string" can_backup="1">
       <default_value>Arcade system is currently undergoing maintenance.</default_value>
@@ -360,18 +367,6 @@
       <edit_format_params></edit_format_params>
       <sub_options></sub_options>
       <relation group_id="xfarcade" display_order="220"/>
-    </option>
-    <option option_id="xfarcade_pc_message" edit_format="textbox" data_type="string" can_backup="1">
-      <default_value>Your score has just been beat. So go back and try again for that champion status.</default_value>
-      <edit_format_params>rows=3</edit_format_params>
-      <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="320"/>
-    </option>
-    <option option_id="xfarcade_pc_title" edit_format="textbox" data_type="string" can_backup="1">
-      <default_value>You've been defeated!</default_value>
-      <edit_format_params></edit_format_params>
-      <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="310"/>
     </option>
     <option option_id="xfarcade_play_display" edit_format="radio" data_type="unsigned_integer" can_backup="1">
       <default_value>1</default_value>
@@ -421,6 +416,14 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_change_vote" version_id="1" version_string="0.9"><![CDATA[Change Vote]]></phrase>
     <phrase title="arcade_confirm_deletion_of_category" version_id="1" version_string="0.0.1"><![CDATA[Confirm Deletion of Category]]></phrase>
     <phrase title="arcade_confirm_deletion_of_game" version_id="1" version_string="super-beta"><![CDATA[Confirm Deletion of Game]]></phrase>
+    <phrase title="arcade_convo_message" version_id="16" version_string="0.1.6"><![CDATA[Hi {old_highscore_username},
+
+I have beaten your old [url={game_link}]{game}[/url] highscore of {old_highscore} that you got on {old_highscore_date}. My new score is {new_highscore}!
+
+Think you can take it back? [url={game_link}]Play {game} now![/url]
+
+[i]This message has been sent automatically by {board_title}[/i]]]></phrase>
+    <phrase title="arcade_convo_title" version_id="16" version_string="0.1.6"><![CDATA[I am the new Champion of {game}]]></phrase>
     <phrase title="arcade_copyright" version_id="3" version_string="0.0.3"><![CDATA[<a href="http://xfarcade.com">Gaming by XF Arcade</a>]]></phrase>
     <phrase title="arcade_create_new_category" version_id="1" version_string="0.9"><![CDATA[Create New Category]]></phrase>
     <phrase title="arcade_delete_category" version_id="1" version_string="0.9"><![CDATA[Delete Category]]></phrase>
@@ -497,11 +500,13 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_you_have_already_voted_this" version_id="1" version_string="0.9"><![CDATA[You have already voted this.]]></phrase>
     <phrase title="arcade_you_have_not_played_yet" version_id="1" version_string="0.9"><![CDATA[You haven't tried it yet]]></phrase>
     <phrase title="game_id_user_id" version_id="1" version_string="0.9"><![CDATA[Target]]></phrase>
-    <phrase title="option_group_xfarcade" version_id="1" version_string="0.9"><![CDATA[XF Arcade]]></phrase>
-    <phrase title="option_group_xfarcade_description" version_id="9" version_string="0.0.8.1"><![CDATA[Powerful multi-format arcade system by the XF Arcade team.]]></phrase>
+    <phrase title="option_group_xfarcade" version_id="16" version_string="0.1.6"><![CDATA[XF Arcade]]></phrase>
+    <phrase title="option_group_xfarcade_description" version_id="16" version_string="0.1.6"><![CDATA[]]></phrase>
     <phrase title="option_xfarcade_auto_navbar" version_id="9" version_string="0.0.8.1"><![CDATA[Enable NavBar Link]]></phrase>
     <phrase title="option_xfarcade_auto_navbar_explain" version_id="9" version_string="0.0.8.1"><![CDATA[Automatically add a link to the NavBar?]]></phrase>
     <phrase title="option_xfarcade_champion" version_id="9" version_string="0.0.8.1"><![CDATA[Enable champion seal]]></phrase>
+    <phrase title="option_xfarcade_championStartConversation" version_id="16" version_string="0.1.6"><![CDATA[Start Conversation for Champion Take Over]]></phrase>
+    <phrase title="option_xfarcade_championStartConversation_explain" version_id="16" version_string="0.1.6"><![CDATA[Enable this option to automatically start a new conversation under the new champion user account to let the old champion know he/she has been defeated.]]></phrase>
     <phrase title="option_xfarcade_champion_explain" version_id="15" version_string="0.0.9"><![CDATA[<b>NOT CURRENTLY FUNCTIONAL</b> <strike>Displays a champion seal in forum posts.</strike>]]></phrase>
     <phrase title="option_xfarcade_disabled_message" version_id="9" version_string="0.0.8.1"><![CDATA[Disabled message]]></phrase>
     <phrase title="option_xfarcade_disabled_message_explain" version_id="9" version_string="0.0.8.1"><![CDATA[This message will be displayed when the arcade is disabled.]]></phrase>
@@ -511,10 +516,6 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="option_xfarcade_enable_explain" version_id="9" version_string="0.0.8.1"><![CDATA[]]></phrase>
     <phrase title="option_xfarcade_image_path" version_id="9" version_string="0.0.8.1"><![CDATA[Champion seal image]]></phrase>
     <phrase title="option_xfarcade_image_path_explain" version_id="15" version_string="0.0.9"><![CDATA[<b>NOT CURRENTLY FUNCTIONAL</b> <strike>Enter the path relative to your forum root of an image to use for champion seals. If this is left blank, the phrase arcade_champion_of_x will be used instead.</strike>]]></phrase>
-    <phrase title="option_xfarcade_pc_message" version_id="9" version_string="0.0.8.1"><![CDATA[Defeated conversation message]]></phrase>
-    <phrase title="option_xfarcade_pc_message_explain" version_id="15" version_string="0.0.9"><![CDATA[<b>NOT CURRENTLY FUNCTIONAL</b> <strike>Enter the message for the PM that will be sent to the previous champion when their highscore is beaten. BBCode is supported.</strike>]]></phrase>
-    <phrase title="option_xfarcade_pc_title" version_id="9" version_string="0.0.8.1"><![CDATA[Defeated conversation title]]></phrase>
-    <phrase title="option_xfarcade_pc_title_explain" version_id="15" version_string="0.0.9"><![CDATA[<b>NOT CURRENTLY FUNCTIONAL</b> <strike>Enter the title for the PM that will be sent to the previous champion when their highscore is beaten.</strike>]]></phrase>
     <phrase title="option_xfarcade_play_display" version_id="9" version_string="0.0.8.1"><![CDATA[Game display mode]]></phrase>
     <phrase title="option_xfarcade_play_display_explain" version_id="16" version_string="0.1.6"><![CDATA[Select the way in which active games should be displayed.]]></phrase>
     <phrase title="permission_group_xfarcade" version_id="1" version_string="0.9"><![CDATA[XF Arcade]]></phrase>

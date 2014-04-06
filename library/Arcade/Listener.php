@@ -28,11 +28,14 @@ class Arcade_Listener
 
 	public static function load_class($class, array &$extend)
 	{
-		static $classes = array('XenForo_ControllerPublic_Index', );
+		static $classes = array(
+			'XenForo_ControllerPublic_Index',
+			'XenForo_DataWriter_User',
+		);
 
 		if (in_array($class, $classes))
 		{
-			$extend[] = str_replace('XenForo_', 'Arcade_Extend_', $class);
+			$extend[] = 'Arcade_' . $class;
 		}
 	}
 
@@ -40,9 +43,11 @@ class Arcade_Listener
 	{
 		if (defined('IS_ARCADE_PHP'))
 		{
-			XenForo_Link::setHandlerInfoForGroup('public', array('index' => $data['routesPublic']['arcade']));
+			$routesPublic = Arcade_Helper_Link::getHandlerInfoForGroup('public');
+			$routesPublic['index'] = $data['routesPublic']['arcade'];
+			XenForo_Link::setHandlerInfoForGroup('public', $routesPublic);
 		}
-		
+
 		XenForo_Template_Helper_Core::$helperCallbacks['arcade_getoption'] = array(
 			'Arcade_Option',
 			'get'
