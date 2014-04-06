@@ -55,6 +55,44 @@ class Arcade_Listener
 		XenForo_Template_Helper_Core::$helperCallbacks['arcade_base64_encode'] = 'base64_encode';
 	}
 
+	public static function template_create(&$templateName, array &$params, XenForo_Template_Abstract $template)
+	{
+		static $preLoadedCommonTemplates = false;
+
+		if (!$preLoadedCommonTemplates)
+		{
+			$template->preloadTemplate('arcade_hook_message_user_info_text');
+		}
+	}
+
+	public static function template_hook($hookName, &$contents, array $hookParams, XenForo_Template_Abstract $template)
+	{
+		switch ($hookName)
+		{
+			case 'message_user_info_text':
+				if (XenForo_Template_Helper_Core::styleProperty('xfarcade_messageShowChampion'))
+				{
+					$params = $template->getParams();
+					$params['user'] = $hookParams['user'];
+
+					if (!empty($params['user']['arcade_champion']))
+					{
+						$params['userChampion'] = unserialize($params['user']['arcade_champion']);
+					}
+
+					if (!empty($params['userChampion']))
+					{
+						$ourTemplate = $template->create('arcade_hook_message_user_info_text', $params);
+						$ourHtml = $ourTemplate->render();
+
+						$search = '<!-- slot: message_user_info_text -->';
+						$contents = str_replace($search, $ourHtml . $search, $contents);
+					}
+				}
+				break;
+		}
+	}
+
 	public static function file_health_check(XenForo_ControllerAdmin_Abstract $controller, array &$hashes)
 	{
 		$hashes += Arcade_FileSums::getHashes();

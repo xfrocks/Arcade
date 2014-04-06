@@ -318,8 +318,9 @@
     <listener event_id="init_dependencies" execute_order="10" callback_class="Arcade_Listener" callback_method="init_dependencies" active="1" hint="" description=""/>
     <listener event_id="load_class_controller" execute_order="9999" callback_class="Arcade_Listener" callback_method="load_class" active="1" hint="" description=""/>
     <listener event_id="load_class_datawriter" execute_order="10" callback_class="Arcade_Listener" callback_method="load_class" active="1" hint="" description=""/>
-    <listener event_id="navigation_tabs" execute_order="1000" callback_class="Arcade_Listener" callback_method="navigation_tabs" active="1" hint="" description="Add menu links"/>
-    <listener event_id="template_hook" execute_order="20" callback_class="Arcade_Template_Hook" callback_method="template" active="1" hint="" description="Adds the champion seal if enabled."/>
+    <listener event_id="navigation_tabs" execute_order="1000" callback_class="Arcade_Listener" callback_method="navigation_tabs" active="1" hint="" description=""/>
+    <listener event_id="template_create" execute_order="10" callback_class="Arcade_Listener" callback_method="template_create" active="1" hint="" description=""/>
+    <listener event_id="template_hook" execute_order="20" callback_class="Arcade_Listener" callback_method="template_hook" active="1" hint="" description=""/>
   </code_event_listeners>
   <cron/>
   <email_templates/>
@@ -331,12 +332,6 @@
       <edit_format_params></edit_format_params>
       <sub_options></sub_options>
       <relation group_id="xfarcade" display_order="125"/>
-    </option>
-    <option option_id="xfarcade_champion" edit_format="onoff" data_type="boolean" can_backup="1">
-      <default_value>0</default_value>
-      <edit_format_params></edit_format_params>
-      <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="210"/>
     </option>
     <option option_id="xfarcade_championStartConversation" edit_format="onoff" data_type="unsigned_integer" can_backup="1">
       <default_value>1</default_value>
@@ -361,12 +356,6 @@
       <edit_format_params></edit_format_params>
       <sub_options></sub_options>
       <relation group_id="xfarcade" display_order="120"/>
-    </option>
-    <option option_id="xfarcade_image_path" edit_format="textbox" data_type="string" can_backup="1">
-      <default_value></default_value>
-      <edit_format_params></edit_format_params>
-      <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="220"/>
     </option>
     <option option_id="xfarcade_play_display" edit_format="radio" data_type="unsigned_integer" can_backup="1">
       <default_value>1</default_value>
@@ -412,7 +401,7 @@ You are adding a new game.  Adding a new game manually is a two-step process.  A
     <phrase title="arcade_category_not_found" version_id="1" version_string="0.9"><![CDATA[The requested category could not be found.]]></phrase>
     <phrase title="arcade_category_title_must_be_unique" version_id="1" version_string="0.9"><![CDATA[Category title must be unique. A category has already existed with the specified title.]]></phrase>
     <phrase title="arcade_champion" version_id="1" version_string="0.9"><![CDATA[Champion]]></phrase>
-    <phrase title="arcade_champion_of_x" global_cache="1" version_id="9" version_string="0.0.8.1"><![CDATA[Champion of {game}]]></phrase>
+    <phrase title="arcade_champion_of_x" global_cache="1" version_id="16" version_string="0.1.6"><![CDATA[{game} Champion]]></phrase>
     <phrase title="arcade_change_vote" version_id="1" version_string="0.9"><![CDATA[Change Vote]]></phrase>
     <phrase title="arcade_confirm_deletion_of_category" version_id="1" version_string="0.0.1"><![CDATA[Confirm Deletion of Category]]></phrase>
     <phrase title="arcade_confirm_deletion_of_game" version_id="1" version_string="super-beta"><![CDATA[Confirm Deletion of Game]]></phrase>
@@ -424,7 +413,6 @@ Think you can take it back? [url={game_link}]Play {game} now![/url]
 
 [i]This message has been sent automatically by {board_title}[/i]]]></phrase>
     <phrase title="arcade_convo_title" version_id="16" version_string="0.1.6"><![CDATA[I am the new Champion of {game}]]></phrase>
-    <phrase title="arcade_copyright" version_id="3" version_string="0.0.3"><![CDATA[<a href="http://xfarcade.com">Gaming by XF Arcade</a>]]></phrase>
     <phrase title="arcade_create_new_category" version_id="1" version_string="0.9"><![CDATA[Create New Category]]></phrase>
     <phrase title="arcade_delete_category" version_id="1" version_string="0.9"><![CDATA[Delete Category]]></phrase>
     <phrase title="arcade_delete_game" version_id="1" version_string="0.9"><![CDATA[Delete Game]]></phrase>
@@ -504,18 +492,14 @@ Think you can take it back? [url={game_link}]Play {game} now![/url]
     <phrase title="option_group_xfarcade_description" version_id="16" version_string="0.1.6"><![CDATA[]]></phrase>
     <phrase title="option_xfarcade_auto_navbar" version_id="9" version_string="0.0.8.1"><![CDATA[Enable NavBar Link]]></phrase>
     <phrase title="option_xfarcade_auto_navbar_explain" version_id="9" version_string="0.0.8.1"><![CDATA[Automatically add a link to the NavBar?]]></phrase>
-    <phrase title="option_xfarcade_champion" version_id="9" version_string="0.0.8.1"><![CDATA[Enable champion seal]]></phrase>
     <phrase title="option_xfarcade_championStartConversation" version_id="16" version_string="0.1.6"><![CDATA[Start Conversation for Champion Take Over]]></phrase>
     <phrase title="option_xfarcade_championStartConversation_explain" version_id="16" version_string="0.1.6"><![CDATA[Enable this option to automatically start a new conversation under the new champion user account to let the old champion know he/she has been defeated.]]></phrase>
-    <phrase title="option_xfarcade_champion_explain" version_id="15" version_string="0.0.9"><![CDATA[<b>NOT CURRENTLY FUNCTIONAL</b> <strike>Displays a champion seal in forum posts.</strike>]]></phrase>
     <phrase title="option_xfarcade_disabled_message" version_id="9" version_string="0.0.8.1"><![CDATA[Disabled message]]></phrase>
     <phrase title="option_xfarcade_disabled_message_explain" version_id="9" version_string="0.0.8.1"><![CDATA[This message will be displayed when the arcade is disabled.]]></phrase>
     <phrase title="option_xfarcade_enable" version_id="9" version_string="0.0.8.1"><![CDATA[Arcade enabled]]></phrase>
     <phrase title="option_xfarcade_enable_categories" version_id="9" version_string="0.0.8.1"><![CDATA[Enable categories]]></phrase>
     <phrase title="option_xfarcade_enable_categories_explain" version_id="15" version_string="0.0.9"><![CDATA[<b>NO LONGER APPLICABLE WITH CURRENT VERSION.  WILL BE DECIDED IF WE WANT TO KEEP THIS OPTION OR NOT.</b> <strike>Disable this option to hide the game categories system from users - best used for small arcades.</strike>]]></phrase>
     <phrase title="option_xfarcade_enable_explain" version_id="9" version_string="0.0.8.1"><![CDATA[]]></phrase>
-    <phrase title="option_xfarcade_image_path" version_id="9" version_string="0.0.8.1"><![CDATA[Champion seal image]]></phrase>
-    <phrase title="option_xfarcade_image_path_explain" version_id="15" version_string="0.0.9"><![CDATA[<b>NOT CURRENTLY FUNCTIONAL</b> <strike>Enter the path relative to your forum root of an image to use for champion seals. If this is left blank, the phrase arcade_champion_of_x will be used instead.</strike>]]></phrase>
     <phrase title="option_xfarcade_play_display" version_id="9" version_string="0.0.8.1"><![CDATA[Game display mode]]></phrase>
     <phrase title="option_xfarcade_play_display_explain" version_id="16" version_string="0.1.6"><![CDATA[Select the way in which active games should be displayed.]]></phrase>
     <phrase title="permission_group_xfarcade" version_id="1" version_string="0.9"><![CDATA[XF Arcade]]></phrase>
@@ -524,6 +508,8 @@ Think you can take it back? [url={game_link}]Play {game} now![/url]
     <phrase title="permission_xfarcade_xfarcade_can_use" version_id="5" version_string="0.0.5"><![CDATA[Can play games (requires View permission)]]></phrase>
     <phrase title="permission_xfarcade_xfarcade_can_view" version_id="5" version_string="0.0.5"><![CDATA[Can view Arcade]]></phrase>
     <phrase title="permission_xfarcade_xfarcade_can_vote" version_id="1" version_string="0.9"><![CDATA[Can vote]]></phrase>
+    <phrase title="style_property_xfarcade_messageShowChampion_description_master" version_id="16" version_string="0.1.6"><![CDATA[Display list of games in which the message author is the champion.]]></phrase>
+    <phrase title="style_property_xfarcade_messageShowChampion_master" version_id="16" version_string="0.1.6"><![CDATA[Show author Arcade champion status]]></phrase>
   </phrases>
   <route_prefixes>
     <route_type type="admin">
@@ -533,7 +519,9 @@ Think you can take it back? [url={game_link}]Play {game} now![/url]
       <prefix original_prefix="arcade" class="Arcade_Route_Prefix_Arcade" build_link="data_only"/>
     </route_type>
   </route_prefixes>
-  <style_properties/>
+  <style_properties>
+    <property property_name="xfarcade_messageShowChampion" property_type="scalar" definition="1" group_name="message" title="Show author Arcade champion status" description="Display list of games in which the message author is the champion." css_components="" scalar_type="boolean" scalar_parameters="" display_order="9999" sub_group="User Info"><![CDATA[1]]></property>
+  </style_properties>
   <templates>
     <template title="arcade.css" version_id="16" version_string="0.1.6"><![CDATA[/* *** XF ARCADE *** */
 /** column style and width **/
@@ -698,6 +686,14 @@ a.GameVoteLink.GameVoted {
 .gamePlayer
 {
 	text-align: center;
+}
+
+.championGameList
+{
+	font-size: 0.9em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }]]></template>
     <template title="arcade_category_browse" version_id="15" version_string="0.0.9"><![CDATA[<xen:require css="arcade.css" />
 
@@ -746,10 +742,6 @@ a.GameVoteLink.GameVoted {
 	</div>
 </div>
 </xen:sidebar>
-]]></template>
-    <template title="arcade_copyright" version_id="5" version_string="0.0.5"><![CDATA[<xen:if is="{$controllerName} == 'Arcade_ControllerPublic_Arcade'">
-<li>&nbsp;{xen:phrase arcade_copyright}</li>
-</xen:if>
 ]]></template>
     <template title="arcade_game_list" version_id="15" version_string="0.0.9"><![CDATA[<form action="<xen:if is="{$category}">{xen:link 'arcade/browse', $category}<xen:else />{xen:link arcade}</xen:if>" method="post" class="gameList">
 	<dl class="sectionHeaders">
@@ -901,6 +893,14 @@ a.GameVoteLink.GameVoted {
      </ol>
 </div>
 ]]></template>
+    <template title="arcade_hook_message_user_info_text" version_id="16" version_string="0.1.6"><![CDATA[<xen:require css="arcade.css" />
+<ul class="championGameList champion-{$user.user_id}">
+	<xen:foreach loop="$userChampion" value="$champion">
+		<li class="championGameList champion-game-{$champion.game.game_id}">
+			{xen:phrase arcade_champion_of_x, 'game=<a href="{xen:link arcade, $champion.game}">{$champion.game.title}</a>'}
+		</li>
+	</xen:foreach>
+</ul>]]></template>
     <template title="arcade_index" version_id="15" version_string="0.0.9"><![CDATA[<xen:require css="arcade.css" />
 
 <xen:title>{xen:phrase arcade}</xen:title>
@@ -1011,9 +1011,6 @@ a.GameVoteLink.GameVoted {
 		pluginspage="http://www.macromedia.com/go/getflashplayer"
 		type="application/x-shockwave-flash"></embed>
 </object>]]></template>
-    <template title="arcade_post_champion_seal" version_id="2" version_string="0.0.2"><![CDATA[<xen:if is="{$post.champion}">
-<dl class="pairsInline"><dt>:){xen:raw $post.champion}</dt></dl>
-</xen:if>]]></template>
     <template title="arcade_vote" version_id="1" version_string="0.9"><![CDATA[<xen:if is="{$game.voted_date}">
 	<xen:title>{xen:phrase arcade_change_vote}</xen:title>
 <xen:else />
