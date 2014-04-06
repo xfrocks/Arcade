@@ -211,7 +211,7 @@ class Arcade_Model_Import extends XenForo_Model
 		{
 			// it looks like all core game package contains an install file in the format
 			// '{$slug}.game.php', feel free to remove this detecting routine if it gives
-			// true negative results
+			// false positive results
 			$installFilePath = Arcade_Helper_File::buildPath($dir, $gameInfo['slug'] . '.game.php');
 			if (file_exists($installFilePath))
 			{

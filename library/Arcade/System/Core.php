@@ -83,6 +83,64 @@ class Arcade_System_Core extends Arcade_System_Abstract
 					}
 				}
 
+				if (empty($shortname))
+				{
+					// not the typical $var = value install file
+					// try v3 Arcade vBulletin install file
+					$installContents = file_get_contents($installFilePath);
+					if (preg_match('#INSERT INTO.+games.*\((?<keys>[^)]+)\).+VALUES.+\((?<values>[^)]+)\)#i', $installContents, $matches))
+					{
+						$foundKeys = array_map('trim', explode(',', $matches['keys']));
+						$foundValues = array_map('trim', explode(',', $matches['values']));
+
+						if (count($foundKeys) == count($foundValues))
+						{
+							$foundData = array_combine($foundKeys, $foundValues);
+							foreach ($foundData as $foundKey => $foundValue)
+							{
+								switch ($foundKey)
+								{
+									case 'title':
+										$tmp = Arcade_Helper_PhpParser::parseString($foundValue);
+										if (!empty($tmp))
+										{
+											$title = $tmp;
+										}
+										break;
+									case 'shortname':
+										$tmp = Arcade_Helper_PhpParser::parseString($foundValue);
+										if (!empty($tmp))
+										{
+											$shortname = $tmp;
+										}
+										break;
+									case 'descr':
+										$tmp = Arcade_Helper_PhpParser::parseString($foundValue);
+										if (!empty($tmp))
+										{
+											$description = $tmp;
+										}
+										break;
+									case 'width':
+										$tmp = Arcade_Helper_PhpParser::parseNumber($foundValue);
+										if ($tmp > 0)
+										{
+											$gameWidth = $tmp;
+										}
+										break;
+									case 'height':
+										$tmp = Arcade_Helper_PhpParser::parseNumber($foundValue);
+										if ($tmp > 0)
+										{
+											$gameHeight = $tmp;
+										}
+										break;
+								}
+							}
+						}
+					}
+				}
+
 				if (!empty($shortname) AND $shortname === $gameInfo['slug'])
 				{
 					// compare $shortname to check whether we have parsed the script correctly
