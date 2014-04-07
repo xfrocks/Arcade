@@ -687,24 +687,25 @@ a.GameVoteLink.GameVoted {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }]]></template>
-    <template title="arcade_category_browse" version_id="16" version_string="0.1.6"><![CDATA[<xen:require css="arcade.css" />
+    <template title="arcade_category_browse" version_id="16" version_string="0.1.6"><![CDATA[<xen:title>{xen:phrase arcade_category} {$category.title}</xen:title>
 
-<xen:title>{xen:phrase arcade_category} {$category.title}</xen:title>
-<xen:h1>
-	{$category.title}<xen:if is="{$order} == 'game_id'">
-	- {xen:phrase most_recent}<xen:elseif is="{$order} == 'play_count'"/>
-	- {xen:phrase arcade_most_played}</xen:if>
-</xen:h1>
-
+<xen:if is="{$order} == 'game_id'">
+	<xen:h1>{xen:phrase most_recent}</xen:h1>
+<xen:elseif is="{$order} == 'play_count'" />
+	<xen:h1>{xen:phrase arcade_most_played}</xen:h1>
+<xen:else />
+	<xen:h1>{$category.title}</xen:h1>
+</xen:if>
 
 <xen:if is="{$category.description}">
 	<xen:description>{$category.description}</xen:description>
 </xen:if>
 
 <xen:navigation>
-	<xen:breadcrumb href="{xen:link full:arcade}">{xen:phrase arcade}</xen:breadcrumb>
-	<xen:breadcrumb href="{xen:link full:arcade/browse, $category}">{$category.title}</xen:breadcrumb>
+	<xen:breadcrumb source="$breadcrumbs" />
 </xen:navigation>
+
+<xen:require css="arcade.css" />
 
 <div class="section">
 	<xen:include template="arcade_header_tabs" />
@@ -896,15 +897,16 @@ a.GameVoteLink.GameVoted {
     <template title="arcade_index" version_id="16" version_string="0.1.6"><![CDATA[<xen:require css="arcade.css" />
 
 <xen:title>{xen:phrase arcade}</xen:title>
-<xen:navigation>
-	<xen:breadcrumb href="{xen:link full:arcade}">{xen:phrase arcade}</xen:breadcrumb>
-</xen:navigation>
 
-<xen:h1>
-	{xen:phrase arcade}<xen:if is="{$order} == 'game_id'">
-	- {xen:phrase most_recent}<xen:elseif is="{$order} == 'play_count'"/>
-	- {xen:phrase arcade_most_played}</xen:if>
-</xen:h1>
+<xen:if is="{$order} == 'game_id'">
+	<xen:h1>{xen:phrase most_recent}</xen:h1>
+<xen:elseif is="{$order} == 'play_count'" />
+	<xen:h1>{xen:phrase arcade_most_played}</xen:h1>
+</xen:if>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadcrumbs" />
+</xen:navigation>
 
 <div class="section">
 	<xen:include template="arcade_header_tabs" />
@@ -928,19 +930,17 @@ a.GameVoteLink.GameVoted {
 	</xen:foreach>
 </ul>]]></template>
     <template title="arcade_play" version_id="16" version_string="0.1.6"><![CDATA[<xen:title>{xen:phrase arcade_play} {$game.title}</xen:title>
-<xen:h1>{$game.title}</xen:h1>
-
-<xen:require css="arcade.css" />
-
+<xen:h1>{xen:phrase arcade_play}</xen:h1>
 <xen:if is="{$game.description}">
-<xen:description>{$game.description}</xen:description>
+	<xen:description>{$game.description}</xen:description>
 </xen:if>
 
 <xen:navigation>
-	<xen:breadcrumb href="{xen:link full:arcade}">{xen:phrase arcade}</xen:breadcrumb>
-	<xen:breadcrumb href="{xen:link full:arcade/browse, $category}">{$category.title}</xen:breadcrumb>
-	<xen:breadcrumb href="{xen:link full:arcade, $game}">{$game.title}</xen:breadcrumb>
+	<xen:breadcrumb source="$breadcrumbs" />
 </xen:navigation>
+
+
+<xen:require css="arcade.css" />
 
 <div class="sectionMain">
 	<div class="primaryContent gamePlayer">

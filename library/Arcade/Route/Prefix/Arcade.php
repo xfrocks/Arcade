@@ -4,6 +4,12 @@ class Arcade_Route_Prefix_Arcade implements XenForo_Route_Interface
 {
 	public function match($routePath, Zend_Controller_Request_Http $request, XenForo_Router $router)
 	{
+		$section = 'arcade';
+		if (!Arcade_Option::get('auto_navbar'))
+		{
+			$section = 'forums';
+		}
+
 		$gamedata = 'gamedata';
 		if (strpos($routePath, $gamedata) === 0)
 		{
@@ -26,7 +32,7 @@ class Arcade_Route_Prefix_Arcade implements XenForo_Route_Interface
 
 				$request->setParam('slug', $slug);
 				$request->setParam('file', $file);
-				return $router->getRouteMatch('Arcade_ControllerPublic_Arcade', 'IpbGameData', 'arcade');
+				return $router->getRouteMatch('Arcade_ControllerPublic_Arcade', 'IpbGameData', $section);
 			}
 		}
 
@@ -39,7 +45,7 @@ class Arcade_Route_Prefix_Arcade implements XenForo_Route_Interface
 			$action = $router->resolveActionWithIntegerOrStringParam($routePath, $request, 'id', 'slug');
 		}
 
-		return $router->getRouteMatch('Arcade_ControllerPublic_Arcade', $action, 'arcade');
+		return $router->getRouteMatch('Arcade_ControllerPublic_Arcade', $action, $section);
 	}
 
 	public function buildLink($originalPrefix, $outputPrefix, $action, $extension, $data, array &$extraParams)
