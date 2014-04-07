@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addon addon_id="arcade" title="XF Arcade" version_string="0.1.6" version_id="16" url="http://xfarcade.com" install_callback_class="Arcade_Installer" install_callback_method="install" uninstall_callback_class="Arcade_Installer" uninstall_callback_method="uninstall">
   <admin_navigation>
-    <navigation navigation_id="arcade" parent_navigation_id="" display_order="21" link="arcade" admin_permission_id="arcade" debug_only="0" hide_no_children="1"/>
-    <navigation navigation_id="arcade_categories" parent_navigation_id="arcade" display_order="2" link="arcade/categories" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
-    <navigation navigation_id="arcade_game_add" parent_navigation_id="arcade_games" display_order="20" link="arcade/add-game" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
-    <navigation navigation_id="arcade_game_list" parent_navigation_id="arcade_games" display_order="1" link="arcade/games" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
-    <navigation navigation_id="arcade_games" parent_navigation_id="arcade" display_order="1" link="arcade/games" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
-    <navigation navigation_id="arcade_import" parent_navigation_id="arcade_games" display_order="9999" link="arcade/import" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
-    <navigation navigation_id="arcade_options" parent_navigation_id="arcade" display_order="100" link="options/list/xfarcade" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="arcade" parent_navigation_id="applications" display_order="9999" link="arcade" admin_permission_id="arcade" debug_only="0" hide_no_children="1"/>
+    <navigation navigation_id="arcade_categories" parent_navigation_id="arcade" display_order="2000" link="arcade/categories" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="arcade_game_add" parent_navigation_id="arcade" display_order="1010" link="arcade/add-game" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="arcade_game_list" parent_navigation_id="arcade" display_order="1000" link="arcade/games" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="arcade_import" parent_navigation_id="arcade" display_order="1020" link="arcade/import" admin_permission_id="arcade" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="arcade_options" parent_navigation_id="arcade" display_order="9999" link="options/list/xfarcade" admin_permission_id="option" debug_only="0" hide_no_children="0"/>
   </admin_navigation>
   <admin_permissions>
     <admin_permission admin_permission_id="arcade" display_order="9999"/>
@@ -210,6 +209,7 @@
 
 <xen:topctrl>
 	<a href="{xen:adminlink 'arcade/add-game'}" class="button" accesskey="a">+ {xen:phrase arcade_add_new_game}</a>
+	<a href="{xen:adminlink 'arcade/import'}" class="button">{xen:phrase arcade_import}</a>
 </xen:topctrl>
 
 <xen:require css="filter_list.css" />
@@ -376,10 +376,9 @@
   <phrases>
     <phrase title="admin_navigation_arcade" version_id="1" version_string="0.0.1"><![CDATA[XF Arcade]]></phrase>
     <phrase title="admin_navigation_arcade_categories" version_id="1" version_string="0.9"><![CDATA[Categories]]></phrase>
-    <phrase title="admin_navigation_arcade_games" version_id="1" version_string="0.9"><![CDATA[Games]]></phrase>
     <phrase title="admin_navigation_arcade_game_add" version_id="1" version_string="0.9"><![CDATA[Add New Game]]></phrase>
-    <phrase title="admin_navigation_arcade_game_list" version_id="10001" version_string="1.0.1"><![CDATA[List Games]]></phrase>
-    <phrase title="admin_navigation_arcade_import" version_id="8" version_string="0.0.8"><![CDATA[Import]]></phrase>
+    <phrase title="admin_navigation_arcade_game_list" version_id="16" version_string="0.1.6"><![CDATA[Games]]></phrase>
+    <phrase title="admin_navigation_arcade_import" version_id="16" version_string="0.1.6"><![CDATA[Import Game]]></phrase>
     <phrase title="admin_navigation_arcade_options" version_id="1" version_string="0.0.1"><![CDATA[Options]]></phrase>
     <phrase title="admin_permission_arcade" version_id="1" version_string="0.0.1"><![CDATA[XF Arcade]]></phrase>
     <phrase title="arcade" global_cache="1" version_id="1" version_string="0.9"><![CDATA[Arcade]]></phrase>
