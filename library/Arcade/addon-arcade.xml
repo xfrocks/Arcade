@@ -706,7 +706,7 @@ a.GameVoteLink.GameVoted {
 	<xen:breadcrumb href="{xen:link full:arcade/browse, $category}">{$category.title}</xen:breadcrumb>
 </xen:navigation>
 
-<div class="resourceListMain section">
+<div class="section">
 	<xen:include template="arcade_header_tabs" />
 
 	<xen:include template="arcade_game_list" />
@@ -906,45 +906,17 @@ a.GameVoteLink.GameVoted {
 	- {xen:phrase arcade_most_played}</xen:if>
 </xen:h1>
 
-<div id="arcadeHome">
-<xen:if is="{$xenOptions.xfarcade_enable}">
-<div class="resourceListMain section">
+<div class="section">
 	<xen:include template="arcade_header_tabs" />
 
-	<ul id="GameCategories">
-		<li id="all">
-			<xen:include template="arcade_game_list">
-				<xen:map from="$allGames" to="$games" />
-				<xen:map from="$allGamesPage" to="$page" />
-				<xen:map from="$allGamesStartOffset" to="$gameStartOffset" />
-				<xen:map from="$allGamesEndOffset" to="$gameEndOffset" />
-				<xen:map from="$allGamesTotal" to="$totalGames" />
-				<xen:set var="$category"></xen:set>
-			</xen:include>
-		</li>
-<!--
-		<li id="new">
-			<xen:include template="arcade_game_list">
-				<xen:map from="$newGames" to="$games" />
-			</xen:include>
-		</li>
-		<li id="random">
-			<xen:include template="arcade_game_list">
-				<xen:map from="$randomGames" to="$games" />
-			</xen:include>
-		</li>
-		<xen:foreach loop="$categories" value="$category">
-		<li id="category-{$category.category_id}" data-loadUrl="{xen:link arcade/browse, $category}">
-			{xen:phrase loading}...
-			<noscript><a href="{xen:link arcade/browse, $category}">{xen:phrase view}</a></noscript>
-		</li>
-		</xen:foreach>
--->
-	</ul>
-</div>
-<xen:else />
-{$xenOptions.xfarcade_disabled_message}
-</xen:if>
+	<xen:include template="arcade_game_list">
+		<xen:map from="$allGames" to="$games" />
+		<xen:map from="$allGamesPage" to="$page" />
+		<xen:map from="$allGamesStartOffset" to="$gameStartOffset" />
+		<xen:map from="$allGamesEndOffset" to="$gameEndOffset" />
+		<xen:map from="$allGamesTotal" to="$totalGames" />
+		<xen:set var="$category"></xen:set>
+	</xen:include>
 </div>
 
 <xen:sidebar>

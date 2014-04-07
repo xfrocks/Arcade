@@ -399,4 +399,14 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly
 		}
 	}
 
+	protected function _preDispatch($action)
+	{
+		if (!Arcade_Option::get('enable'))
+		{
+			throw new XenForo_Exception(Arcade_Option::get('disabled_message'), true);
+		}
+
+		return parent::_preDispatch($action);
+	}
+
 }
