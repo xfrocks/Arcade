@@ -351,12 +351,6 @@
       <sub_options></sub_options>
       <relation group_id="xfarcade" display_order="1"/>
     </option>
-    <option option_id="xfarcade_enable_categories" edit_format="onoff" data_type="boolean" can_backup="1">
-      <default_value>1</default_value>
-      <edit_format_params></edit_format_params>
-      <sub_options></sub_options>
-      <relation group_id="xfarcade" display_order="120"/>
-    </option>
     <option option_id="xfarcade_play_display" edit_format="radio" data_type="unsigned_integer" can_backup="1">
       <default_value>1</default_value>
       <edit_format_params>1=Separate page
@@ -497,8 +491,6 @@ Think you can take it back? [url={game_link}]Play {game} now![/url]
     <phrase title="option_xfarcade_disabled_message" version_id="9" version_string="0.0.8.1"><![CDATA[Disabled message]]></phrase>
     <phrase title="option_xfarcade_disabled_message_explain" version_id="9" version_string="0.0.8.1"><![CDATA[This message will be displayed when the arcade is disabled.]]></phrase>
     <phrase title="option_xfarcade_enable" version_id="9" version_string="0.0.8.1"><![CDATA[Arcade enabled]]></phrase>
-    <phrase title="option_xfarcade_enable_categories" version_id="9" version_string="0.0.8.1"><![CDATA[Enable categories]]></phrase>
-    <phrase title="option_xfarcade_enable_categories_explain" version_id="15" version_string="0.0.9"><![CDATA[<b>NO LONGER APPLICABLE WITH CURRENT VERSION.  WILL BE DECIDED IF WE WANT TO KEEP THIS OPTION OR NOT.</b> <strike>Disable this option to hide the game categories system from users - best used for small arcades.</strike>]]></phrase>
     <phrase title="option_xfarcade_enable_explain" version_id="9" version_string="0.0.8.1"><![CDATA[]]></phrase>
     <phrase title="option_xfarcade_play_display" version_id="9" version_string="0.0.8.1"><![CDATA[Game display mode]]></phrase>
     <phrase title="option_xfarcade_play_display_explain" version_id="16" version_string="0.1.6"><![CDATA[Select the way in which active games should be displayed.]]></phrase>
@@ -695,17 +687,18 @@ a.GameVoteLink.GameVoted {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }]]></template>
-    <template title="arcade_category_browse" version_id="15" version_string="0.0.9"><![CDATA[<xen:require css="arcade.css" />
+    <template title="arcade_category_browse" version_id="16" version_string="0.1.6"><![CDATA[<xen:require css="arcade.css" />
 
 <xen:title>{xen:phrase arcade_category} {$category.title}</xen:title>
-<xen:h1>{$category.title}
-<xen:if is="{$order} == 'game_id'">- {xen:phrase most_recent}</xen:if>
-<xen:if is="{$order} == 'play_count'">- {xen:phrase arcade_most_played}</xen:if>
+<xen:h1>
+	{$category.title}<xen:if is="{$order} == 'game_id'">
+	- {xen:phrase most_recent}<xen:elseif is="{$order} == 'play_count'"/>
+	- {xen:phrase arcade_most_played}</xen:if>
 </xen:h1>
 
 
 <xen:if is="{$category.description}">
-<xen:description>{$category.description}</xen:description>
+	<xen:description>{$category.description}</xen:description>
 </xen:if>
 
 <xen:navigation>
@@ -713,35 +706,34 @@ a.GameVoteLink.GameVoted {
 	<xen:breadcrumb href="{xen:link full:arcade/browse, $category}">{$category.title}</xen:breadcrumb>
 </xen:navigation>
 
-<xen:include template="arcade_category_sidebar" />
-
 <div class="resourceListMain section">
-<xen:include template="arcade_header_tabs" />
-<div class="<xen:if is="{$inTab}">x</xen:if>sectionMain">
+	<xen:include template="arcade_header_tabs" />
+
 	<xen:include template="arcade_game_list" />
 </div>
 
-</div>]]></template>
-    <template title="arcade_category_sidebar" version_id="15" version_string="0.0.9"><![CDATA[<xen:sidebar>
-<div class="section" style="{xen:if $enableCategories, '', 'display:none'}">
+<xen:sidebar>
+	<xen:include template="arcade_category_sidebar" />
+</xen:sidebar>]]></template>
+    <template title="arcade_category_sidebar" version_id="16" version_string="0.1.6"><![CDATA[<xen:if is="{$categories}">
+	<div class="section">
 	<div class="secondaryContent">
 		<h3>{xen:phrase categories}</h3>
-		<xen:if is="{$categories}">
-		    <ul class="TabsX" data-panes="#GameCategories > li" data-history="on">
-                    <li class="{xen:if '{$selectedCategoryId} == ""', selected}"><a href="{xen:link full:arcade}">{xen:phrase arcade_all}</a></li>
-                    <xen:foreach loop="$categories" value="$_category">
-     				<li class="{xen:if '{$_category.category_id} == {$selectedCategoryId}', selected}">
-     					<a href="{xen:link 'arcade/browse', $_category}" {xen:if $_category.description, 'title="{xen:helper striphtml, $_category.description}" class="Tooltip" data-tipclass="resourceCategoryTooltip"'}>{$_category.title}</a>
-     					<!-- <span class="count">{xen:number $_category.category_id}</span> -->
-     				</li>
-                    </xen:foreach>
+		    <ul>
+				<li class="{xen:if '!{$selectedCategoryId}', selected}"><a href="{xen:link full:arcade}">{xen:phrase arcade_all}</a></li>
+				
+				<xen:foreach loop="$categories" value="$category">
+					<li class="{xen:if '{$category.category_id} == {$selectedCategoryId}', selected}">
+						<a href="{xen:link 'arcade/browse', $category}"
+						   {xen:if $category.description, 'title="{xen:helper striphtml, $category.description}" class="Tooltip"'}>
+							{$category.title}
+						</a>
+					</li>
+				</xen:foreach>
 		    </ul>
-		<xen:else />
-			<div>{xen:phrase n_a}</div>
-		</xen:if>
+		</div>
 	</div>
-</div>
-</xen:sidebar>
+</xen:if>
 ]]></template>
     <template title="arcade_game_list" version_id="15" version_string="0.0.9"><![CDATA[<form action="<xen:if is="{$category}">{xen:link 'arcade/browse', $category}<xen:else />{xen:link arcade}</xen:if>" method="post" class="gameList">
 	<dl class="sectionHeaders">
@@ -779,7 +771,7 @@ a.GameVoteLink.GameVoted {
 		<xen:pagenav link="arcade" page="{$page}" perpage="{$gamesPerPage}" total="{$totalGames}" />
 	</xen:if>
 </xen:if>]]></template>
-    <template title="arcade_game_list_item" version_id="15" version_string="0.0.9"><![CDATA[<xen:require css="arcade.css" />
+    <template title="arcade_game_list_item" version_id="16" version_string="0.1.6"><![CDATA[<xen:require css="arcade.css" />
 <xen:require css="node_list.css" />
 <xen:require css="node_forum.css" />
 
@@ -803,7 +795,7 @@ a.GameVoteLink.GameVoted {
 
 			<div class="secondRow">
 				<div class="controls faint">				
-					<xen:if is="{$enableCategories}">
+					<xen:if is="{$game.category_id}">
 						<a href="{xen:link 'full:arcade/browse', {xen:array 'category_id={$game.category_id}', 'title={$game.category_title}'}}" class="EditControl">{$game.category_title}</a>
 					</xen:if>
 					
@@ -901,25 +893,23 @@ a.GameVoteLink.GameVoted {
 		</li>
 	</xen:foreach>
 </ul>]]></template>
-    <template title="arcade_index" version_id="15" version_string="0.0.9"><![CDATA[<xen:require css="arcade.css" />
+    <template title="arcade_index" version_id="16" version_string="0.1.6"><![CDATA[<xen:require css="arcade.css" />
 
 <xen:title>{xen:phrase arcade}</xen:title>
 <xen:navigation>
 	<xen:breadcrumb href="{xen:link full:arcade}">{xen:phrase arcade}</xen:breadcrumb>
 </xen:navigation>
 
-<xen:h1>{xen:phrase arcade}
-<xen:if is="{$order} == 'game_id'">- {xen:phrase most_recent}</xen:if>
-<xen:if is="{$order} == 'play_count'">- {xen:phrase arcade_most_played}</xen:if>
+<xen:h1>
+	{xen:phrase arcade}<xen:if is="{$order} == 'game_id'">
+	- {xen:phrase most_recent}<xen:elseif is="{$order} == 'play_count'"/>
+	- {xen:phrase arcade_most_played}</xen:if>
 </xen:h1>
 
 <div id="arcadeHome">
 <xen:if is="{$xenOptions.xfarcade_enable}">
-
-<xen:include template="arcade_category_sidebar" />
-
 <div class="resourceListMain section">
-<xen:include template="arcade_header_tabs" />
+	<xen:include template="arcade_header_tabs" />
 
 	<ul id="GameCategories">
 		<li id="all">
@@ -955,10 +945,14 @@ a.GameVoteLink.GameVoted {
 <xen:else />
 {$xenOptions.xfarcade_disabled_message}
 </xen:if>
-</div>]]></template>
-    <template title="arcade_links" version_id="1" version_string="0.9"><![CDATA[<ul class="secondaryContent blockLinksList">
-	<xen:foreach loop="$links" key="$href" value="$title">
-	<li><a href="{$href}">{$title}</a></li>
+</div>
+
+<xen:sidebar>
+	<xen:include template="arcade_category_sidebar" />
+</xen:sidebar>]]></template>
+    <template title="arcade_links" version_id="16" version_string="0.1.6"><![CDATA[<ul class="secondaryContent blockLinksList">
+	<xen:foreach loop="$categories" value="$category">
+		<li><a href="{xen:link arcade/browse, $category}">{$category.title}</a></li>
 	</xen:foreach>
 </ul>]]></template>
     <template title="arcade_play" version_id="16" version_string="0.1.6"><![CDATA[<xen:title>{xen:phrase arcade_play} {$game.title}</xen:title>

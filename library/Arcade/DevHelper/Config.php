@@ -6,6 +6,9 @@ class Arcade_DevHelper_Config extends DevHelper_Config_Base
 		'xf_user_profile' => array(
 			'arcade_champion' => array('name' => 'arcade_champion', 'type' => 'serialized'),
 		),
+		'xf_arcade_category' => array(
+			'description' => array('name' => 'description', 'type' => 'string'),
+		),
 	);
 	protected $_exportPath = '/Users/sondh/XenForo/Arcade';
 	protected $_exportIncludes = array('arcade.php', 'crossdomain.xml');

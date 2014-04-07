@@ -126,13 +126,6 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly
 			//				'order' => 'random',
 			//			)));
 
-			$enableCategories = Arcade_Option::get('enable_categories');
-			//			if ($allGamesPage > 1) {
-			//				// this is the second page
-			//				// disable categories in all page except the first one!
-			//				$enableCategories = false;
-			//			}
-
 			$viewParams = array(
 				'order' => $order,
 				'selectedCategoryId' => '',
@@ -141,7 +134,6 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly
 				//				'newGames' => $newGames,
 				//				'randomGames' => $randomGames,
 				'canVote' => $canVote,
-				'enableCategories' => $enableCategories,
 
 				'gamesPerPage' => $gamesPerPage,
 				'allGamesPage' => $allGamesPage,
@@ -159,12 +151,8 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly
 	public function actionBrowse()
 	{
 		$this->_checkView();
-		$options = XenForo_Application::get('options');
 
 		$categoryId = $this->_input->filterSingle('id', XenForo_Input::UINT);
-		if (!$options->xfarcade_enable_categories)
-			$categoryId = 0;
-
 		$category = $this->_getCategoryOrError($categoryId);
 
 		$gameModel = $this->_getGameModel();
@@ -199,8 +187,6 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly
 			'gameEndOffset' => ($page - 1) * $gamesPerPage + count($games),
 			'gamesPerPage' => $gamesPerPage,
 			'totalGames' => $totalGames,
-
-			'enableCategories' => $options->xfarcade_enable_categories,
 		);
 
 		return $this->responseView('Arcade_ViewPublic_Category_Browse', 'arcade_category_browse', $viewParams);

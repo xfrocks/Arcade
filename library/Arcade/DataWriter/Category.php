@@ -56,6 +56,11 @@ class Arcade_DataWriter_Category extends XenForo_DataWriter
 		}
 	}
 
+	protected function _postSave()
+	{
+		Arcade_Helper_Category::rebuildCache();
+	}
+
 	protected function _getCategoryModel()
 	{
 		return $this->getModelFromCache('Arcade_Model_Category');

@@ -60,10 +60,9 @@ class Arcade_Route_Prefix_Arcade implements XenForo_Route_Interface
 			{
 				$array['slug'] = $data['slug'];
 			}
-
-			if (isset($data['title']))
+			elseif (isset($data['title']))
 			{
-				$array['title'] = $data['title'];
+				$array['slug'] = $data['title'];
 			}
 		}
 
@@ -71,7 +70,7 @@ class Arcade_Route_Prefix_Arcade implements XenForo_Route_Interface
 		{
 			return XenForo_Link::buildBasicLinkWithIntegerParam($outputPrefix, $action, $extension, $array, 'id', 'slug');
 		}
-		elseif (!empty($$array['slug']))
+		elseif (!empty($array['slug']))
 		{
 			return XenForo_Link::buildBasicLinkWithStringParam($outputPrefix, $action, $extension, $array, 'slug');
 		}

@@ -14,6 +14,14 @@ class Arcade_Installer
 			'alterTableAddColumnQuery' => 'ALTER TABLE `xf_user_profile` ADD COLUMN `arcade_champion` MEDIUMBLOB',
 			'alterTableDropColumnQuery' => 'ALTER TABLE `xf_user_profile` DROP COLUMN `arcade_champion`',
 		),
+		array(
+			'table' => 'xf_arcade_category',
+			'field' => 'description',
+			'showTablesQuery' => 'SHOW TABLES LIKE \'xf_arcade_category\'',
+			'showColumnsQuery' => 'SHOW COLUMNS FROM `xf_arcade_category` LIKE \'description\'',
+			'alterTableAddColumnQuery' => 'ALTER TABLE `xf_arcade_category` ADD COLUMN `description` TEXT',
+			'alterTableDropColumnQuery' => 'ALTER TABLE `xf_arcade_category` DROP COLUMN `description`',
+		),
 	);
 
 	public static function install($existingAddOn, $addOnData)
@@ -80,6 +88,7 @@ class Arcade_Installer
 			CREATE TABLE IF NOT EXISTS `xf_arcade_category` (
 				`category_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 				`title` varchar(50) NOT NULL,
+				`description` TEXT,
 				`display_order` INT(10) UNSIGNED DEFAULT 0,
 				`active` TINYINT(3) UNSIGNED DEFAULT 1,
 				PRIMARY KEY (`category_id`),
