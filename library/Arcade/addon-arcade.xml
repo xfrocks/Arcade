@@ -771,7 +771,7 @@ a.GameVoteLink.GameVoted {
 		<xen:pagenav link="arcade" page="{$page}" perpage="{$gamesPerPage}" total="{$totalGames}" />
 	</xen:if>
 </xen:if>]]></template>
-    <template title="arcade_game_list_item" version_id="16" version_string="0.1.6"><![CDATA[<xen:require css="arcade.css" />
+    <template title="arcade_game_list_item" version_id="17" version_string="0.2.0"><![CDATA[<xen:require css="arcade.css" />
 <xen:require css="node_list.css" />
 <xen:require css="node_forum.css" />
 
@@ -825,7 +825,7 @@ a.GameVoteLink.GameVoted {
 			</div>
 			<div class="infoContainer">
 				<xen:username user="$game" rich="true" /><br />
-				<span class='muted'>{xen:phrase arcade_score}:</span> {xen:number {$game.highscore}}<br />
+				<span class='muted'>{xen:phrase arcade_score}:</span> {xen:helper Arcade_renderScore, $game.highscore}<br />
 				<span class="muted">{xen:date {$game.highscore_date}}</span>
 			</div>
 		<xen:else />
@@ -838,7 +838,11 @@ a.GameVoteLink.GameVoted {
 		<xen:if is="{$game.highscore_user_id}">	
 			<table align='center' class='highscores'>
 			<xen:foreach loop="$game.highscores" value="$score" i="$i">
-				<tr><td width='12'>{xen:calc '{$i}+1'}.</td><td class='name'><xen:username user="$score" rich="true" /></td><td class='datscore'>{xen:number $score.score}</span></td></tr>
+				<tr>
+					<td width='12'>{xen:calc '{$i}+1'}.</td>
+					<td class='name'><xen:username user="$score" rich="true" /></td>
+					<td class='datscore'>{xen:helper Arcade_renderScore, $score.score}</td>
+				</tr>
 			</xen:foreach>	
 			</table>
 		</xen:if>
@@ -849,8 +853,14 @@ a.GameVoteLink.GameVoted {
 		<div class="infoContainer">
 		<xen:if is="{$game.played_date}">
 			<div class="titleText">
-				<span class='muted'>{xen:phrase arcade_your_score}:</span> {xen:number {$game.played_score}}<br />
-				<xen:if is="{$game.played_rank} == 1"><span style='font-style:italic'>{xen:phrase arcade_you_are_the_champion}</span><xen:else /><span class='muted'>Rank:</span> {xen:number {$game.played_rank}}</xen:if>
+				<span class='muted'>{xen:phrase arcade_your_score}:</span>
+				{xen:helper Arcade_renderScore, $game.played_score}<br />
+
+				<xen:if is="{$game.played_rank} == 1">
+					<span style='font-style:italic'>{xen:phrase arcade_you_are_the_champion}</span>
+				<xen:else />
+					<span class='muted'>Rank:</span> {xen:number {$game.played_rank}}
+				</xen:if>
 			</div>
 		<xen:else />
 			<div class="titleText">{xen:phrase arcade_you_have_not_played_yet}</div>

@@ -51,6 +51,11 @@ class Arcade_Listener
 			'get'
 		);
 		XenForo_Template_Helper_Core::$helperCallbacks['arcade_base64_encode'] = 'base64_encode';
+
+		XenForo_Template_Helper_Core::$helperCallbacks['arcade_renderscore'] = array(
+			'Arcade_Template_Helper',
+			'renderScore'
+		);
 	}
 
 	public static function template_create(&$templateName, array &$params, XenForo_Template_Abstract $template)
