@@ -205,7 +205,7 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 	public function actionIpbSaveScoreLegacy()
 	{
 		$input = $this->_input->filter(array(
-			'gscore' => XenForo_Input::STRING,
+			'gscore' => XenForo_Input::FLOAT,
 			'gname' => XenForo_Input::STRING,
 		));
 
@@ -229,7 +229,7 @@ abstract class Arcade_ControllerPublic_ArcadeUgly extends XenForo_ControllerPubl
 	public function actionIpbSaveScore()
 	{
 		$input = $this->_input->filter(array(
-			'gscore' => XenForo_Input::STRING,
+			'gscore' => XenForo_Input::FLOAT,
 			'arcadegid' => XenForo_Input::INT,
 			'enscore' => XenForo_Input::INT,
 			'gname' => XenForo_Input::STRING,
