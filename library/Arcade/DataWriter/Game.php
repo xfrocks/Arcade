@@ -267,6 +267,11 @@ class Arcade_DataWriter_Game extends XenForo_DataWriter
 	protected function _postSaveAfterTransaction()
 	{
 		$system = $this->_getSystemModel()->initSystem($this->get('system_id'));
+		if (empty($system))
+		{
+			throw new XenForo_Exception(new XenForo_Phrase('arcade_specified_system_not_found_x', array('system_id' => $this->get('system_id'))), false);
+		}
+
 		$system->doPostSave($this);
 	}
 
@@ -283,7 +288,10 @@ class Arcade_DataWriter_Game extends XenForo_DataWriter
 		$this->_getSessionModel()->deleteSessionByGameId($existingData['game_id']);
 
 		$system = $this->_getSystemModel()->initSystem($this->get('system_id'));
-		$system->doPostDelete($this);
+		if (!empty($system))
+		{
+			$system->doPostDelete($this);
+		}
 	}
 
 	protected function _verifySlug(&$data)

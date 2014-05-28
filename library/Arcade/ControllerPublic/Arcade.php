@@ -206,6 +206,10 @@ class Arcade_ControllerPublic_Arcade extends Arcade_ControllerPublic_ArcadeUgly
 		}
 
 		$system = $this->_getSystemModel()->initSystem($game['system_id']);
+		if (empty($system))
+		{
+			throw new XenForo_Exception(new XenForo_Phrase('arcade_specified_system_not_found_x', array('system_id' => $game['system_id'])), false);
+		}
 
 		$viewParams = array(
 			'game' => $game,

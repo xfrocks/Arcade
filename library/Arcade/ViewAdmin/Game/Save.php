@@ -21,7 +21,10 @@ class Arcade_ViewAdmin_Game_Save extends XenForo_ViewAdmin_Base
 		if (!empty($game['system_options']) AND (empty($oldGame['system_options']) OR $game['system_options'] != $oldGame['system_options']))
 		{
 			$system = XenForo_Model::create('Arcade_Model_System')->initSystem($game['system_id']);
-			$system->doInterfaceUpdate($output, $this->_params);
+			if (!empty($system))
+			{
+				$system->doInterfaceUpdate($output, $this->_params);
+			}
 		}
 
 		return XenForo_ViewRenderer_Json::jsonEncodeForOutput($output);

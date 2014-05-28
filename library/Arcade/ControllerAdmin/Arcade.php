@@ -126,6 +126,11 @@ class Arcade_ControllerAdmin_Arcade extends XenForo_ControllerAdmin_Abstract
 		{
 			// process options now
 			$system = $this->_getSystemModel()->initSystem($dwInput['system_id']);
+			if (empty($system))
+			{
+				throw new XenForo_Exception(new XenForo_Phrase('arcade_specified_system_not_found_x', array('system_id' => $dwInput['system_id'])), true);
+			}
+
 			$systemOptions = $system->processOptionsInput($this->_input, $dw->getMergedData(), $dw);
 			$dw->set('system_options', $systemOptions);
 		}

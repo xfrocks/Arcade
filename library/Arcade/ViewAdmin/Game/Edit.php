@@ -10,9 +10,12 @@ class Arcade_ViewAdmin_Game_Edit extends XenForo_ViewAdmin_Base
 		if (!empty($game['system_id']))
 		{
 			$system = XenForo_Model::create('Arcade_Model_System')->initSystem($game['system_id']);
-			$this->_params['renderedOptions'] = $system->renderOptions($this, $game);
-			$this->_params['customizedOptions'] = $system->renderCustomizedOptions($this, $game);
-			$this->_params['system_options_loaded'] = $game['system_id'];
+			if (!empty($system))
+			{
+				$this->_params['renderedOptions'] = $system->renderOptions($this, $game);
+				$this->_params['customizedOptions'] = $system->renderCustomizedOptions($this, $game);
+				$this->_params['system_options_loaded'] = $game['system_id'];
+			}
 		}
 
 		$this->_params['systemsSource'] = array();
