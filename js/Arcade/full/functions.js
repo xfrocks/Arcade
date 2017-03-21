@@ -9,11 +9,11 @@
 		__construct: function($select)
 		{
 			this.$select = $select;
-			this.url = $select.data('url');
+			this.startUrl = $select.data('url');
 			this.$target = $($select.data('target'));
-			if (!this.url || !this.$target.length)
+			if (!this.startUrl || !this.$target.length)
 			{
-				console.warn('GameSystemOptions turned off itself: url =', this.url, '$target =', this.$target);
+				console.warn('GameSystemOptions turned off itself: url =', this.startUrl, '$target =', this.$target);
 				return;
 			}
 
@@ -52,7 +52,7 @@
 				this.xhr.abort();
 			}
 
-			this.xhr = XenForo.ajax(this.url,
+			this.xhr = XenForo.ajax(this.startUrl,
 			{
 				'system_id': this.$select.val(),
 				'game_id': $('#gameId').val()
